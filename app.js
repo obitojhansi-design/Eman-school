@@ -23,7 +23,6 @@
         const grid = document.getElementById('studentGrid');
         if (!grid) return;
 
-        // Build size pool for artistic variation
         const pool = [];
         for (let i = 0; i < 2; i++) pool.push('large');
         for (let i = 0; i < 2; i++) pool.push('tall');
@@ -35,9 +34,13 @@
         students.forEach((student, index) => {
             const size = pool[index % pool.length];
             const initials = getInitials(student.name);
-            const imgHtml = student.image
-                ? `<img src="${student.image}" alt="${student.name}" class="student-card__image">`
-                : `<div class="student-card__placeholder"><span>${initials}</span></div>`;
+            // Build image with lazy loading and error fallback
+            let imgHtml;
+            if (student.image) {
+                imgHtml = `<img src="${student.image}" alt="${student.name}" class="student-card__image" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'student-card__placeholder\\'><span>${initials}</span></div>';">`;
+            } else {
+                imgHtml = `<div class="student-card__placeholder"><span>${initials}</span></div>`;
+            }
             html += `
                 <a href="profile.html?id=${student.id}" class="student-card student-card--${size}" data-index="${index}">
                     <div class="student-card__image-wrapper">${imgHtml}</div>
@@ -49,7 +52,6 @@
         grid.innerHTML = html;
     }
 
-    // Ensure students is defined (loaded from students.js)
     if (typeof students !== 'undefined') {
         renderGallery();
     } else {
