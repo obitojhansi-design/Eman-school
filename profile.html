@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMAN · Student Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="profile.css" />
+</head>
+<body>
+
+    <!-- Background layer: blurred portrait + subtle gradient -->
+    <div class="profile-bg" id="profileBg"></div>
+
+    <!-- Main profile container -->
+    <div class="profile-page" id="profilePage">
+        <div class="profile-container" id="profileContainer">
+
+            <!-- Back button (fixed position) -->
+            <button class="profile-back" id="profileBack" aria-label="Back to home">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            <!-- Swipe wrapper for slide transitions -->
+            <div class="profile-swipe-wrapper" id="profileSwipeWrapper">
+                <div class="profile-layout" id="profileLayout">
+
+                    <!-- Left: Portrait -->
+                    <div class="profile-portrait-area">
+                        <div class="profile-portrait-wrapper">
+                            <div class="profile-portrait" id="profilePortrait"></div>
+                        </div>
+                        <!-- subtle green accent line -->
+                        <div class="portrait-accent"></div>
+                    </div>
+
+                    <!-- Right: Information (glass panel) -->
+                    <div class="profile-info-panel">
+                        <!-- Index counter -->
+                        <div class="profile-index" id="profileIndex">01 / 12</div>
+
+                        <!-- Name -->
+                        <h1 class="profile-name" id="profileName"></h1>
+
+                        <!-- Role (typing) -->
+                        <div class="profile-role-wrapper">
+                            <p class="profile-role" id="profileRole"></p>
+                        </div>
+
+                        <!-- Intro -->
+                        <p class="profile-intro" id="profileIntro"></p>
+
+                        <!-- Academic info -->
+                        <div class="profile-academic" id="profileAcademic">
+                            <div class="academic-item">
+                                <span class="academic-label">Class</span>
+                                <span class="academic-value" id="profileClass">—</span>
+                            </div>
+                            <div class="academic-item">
+                                <span class="academic-label">Roll No.</span>
+                                <span class="academic-value" id="profileRoll">—</span>
+                            </div>
+                            <div class="academic-item">
+                                <span class="academic-label">Total Marks</span>
+                                <span class="academic-value" id="profileTotalMarks">—</span>
+                            </div>
+                            <div class="academic-item">
+                                <span class="academic-label">Obtained</span>
+                                <span class="academic-value" id="profileObtainedMarks">—</span>
+                            </div>
+                            <div class="academic-item">
+                                <span class="academic-label">Percentage</span>
+                                <span class="academic-value" id="profilePercentage">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="students.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>
