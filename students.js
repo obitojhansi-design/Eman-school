@@ -66,7 +66,7 @@ const students = [
         obtainedMarks: null,
         role: "The Maverick",
         intro: "Follows his own path, and we're just along for the ride.",
-        image: "images/umair.webp"
+        image: "images/umair.jpeg"
     },
     {
         id: "shehzad",
