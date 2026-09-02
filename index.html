@@ -2,51 +2,402 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eman Educational Complex  · Class Portraits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Eman Educational Complex</title>
+
+    <!-- Fonts (consistent with main project) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* --- Reset & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b0b;
+            color: #f0f0f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 30% 40%, rgba(91, 140, 90, 0.06) 0%, transparent 70%),
+                        radial-gradient(ellipse at 70% 80%, rgba(91, 140, 90, 0.03) 0%, transparent 60%),
+                        #0b0b0b;
+        }
+
+        /* --- Main Container with Perspective --- */
+        .scene {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 100vh;
+            max-height: 800px;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* --- Slide Container (each slide is a "scene" in the journey) --- */
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 720px;
+            padding: 1.2rem 1.8rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px) scale(0.92);
+            transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1),
+                        transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.exit {
+            opacity: 0;
+            transform: translateY(-40px) scale(0.96);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* --- Opening Title Slide --- */
+        .slide-opening .title-main {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.1rem, 1vw, 0.1rem);
+            font-weight: 700;
+            letter-spacing: -0.0em;
+            color: #f5f5f5;
+            line-height: 1.0;
+            white-space: nowrap;      /* force one line */
+        }
+
+        .slide-opening .title-sub {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.5rem, 3vw, 1.2rem);
+            font-weight: 300;
+            color: #8a8a8a;
+            letter-spacing: 0.08em;
+            margin-top: 0.6rem;
+            opacity: 0.7;
+        }
+
+        .slide-opening .accent-line {
+            width: 60px;
+            height: 2px;
+            background: #5b8c5a;
+            margin: 1.2rem auto 0;
+            opacity: 0.4;
+        }
+
+        /* --- Documentary Slides --- */
+        .slide-doc .doc-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 4vw, 2.6rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #5b8c5a;
+            margin-bottom: 0.6rem;
+        }
+
+        .slide-doc .doc-text {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.95rem, 2vw, 1.3rem);
+            font-weight: 300;
+            line-height: 1.7;
+            color: #c8c8c8;
+            max-width: 38ch;
+            margin: 0 auto;
+        }
+
+        /* --- Principal Slide (with photo) --- */
+        .slide-principal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .principal-photo-wrapper {
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(91, 140, 90, 0.25);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            background: #1c1c1c;
+            flex-shrink: 0;
+        }
+
+        .principal-photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .principal-photo-wrapper .fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: #5b8c5a;
+            background: #161616;
+            opacity: 0.4;
+        }
+
+        .principal-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+            font-weight: 700;
+            color: #f5f5f5;
+        }
+
+        .principal-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #8a8a8a;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-top: -0.2rem;
+        }
+
+        /* --- Logo integration (in opening slide) --- */
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .logo-wrapper img {
+            height: 50px;
+            width: auto;
+            display: block;
+        }
+
+        /* --- Responsive adjustments --- */
+        @media (max-width: 600px) {
+            .scene { padding: 0.8rem; max-height: 100vh; }
+            .slide { padding: 0.8rem 1rem; max-width: 100%; }
+            .principal-photo-wrapper { width: 100px; height: 100px; }
+            .slide-opening .title-main { font-size: clamp(1.4rem, 10vw, 2.2rem); }
+            .logo-wrapper img { height: 36px; }
+        }
+
+        @media (max-width: 400px) {
+            .slide-opening .title-main { font-size: clamp(1.1rem, 8vw, 1.6rem); }
+            .principal-photo-wrapper { width: 80px; height: 80px; }
+        }
+
+        /* --- Subtle grain overlay (lightweight) --- */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBudW1PY3RhdmVzPSI0IiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wNCIgLz48L3N2Zz4=');
+            background-repeat: repeat;
+            opacity: 0.15;
+            mix-blend-mode: overlay;
+            z-index: 9999;
+        }
+
+        /* --- Small abstract decorative lines for cinematic feel (optional) --- */
+        .deco-line {
+            position: absolute;
+            background: rgba(91, 140, 90, 0.08);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+        .deco-line-1 { width: 200px; height: 1px; top: 10%; left: 5%; transform: rotate(-5deg); }
+        .deco-line-2 { width: 150px; height: 1px; bottom: 15%; right: 8%; transform: rotate(4deg); }
+        @media (max-width: 600px) {
+            .deco-line { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <header class="site-header" role="banner">
-        <div class="container">
-            <div class="header-content">
-                <div class="header-brand">
-                    <!-- Logo image (root) — replaces old symbol -->
-                    <img src="logo.jpg" alt="Eman Educational Complex logo" class="logo-image" width="50" height="50" />
-                    <h1 class="header-title">
-                        <span class="title-main">Eman</span>
-                        <span class="title-sub">Educational Complex</span>
-                    </h1>
-                </div>
-                <div class="header-tagline">
-                    <p class="tagline">The people of our class</p>
-                    <div class="tagline-accent"></div>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <main class="site-main" role="main">
-        <div class="container">
-            <div class="gallery-intro">
-                <p class="gallery-hint">Tap a portrait to discover the story</p>
-            </div>
-            <div class="student-grid" id="studentGrid" role="list"></div>
-        </div>
-    </main>
+    <div class="scene" id="scene">
+        <!-- Abstract decorative lines -->
+        <div class="deco-line deco-line-1"></div>
+        <div class="deco-line deco-line-2"></div>
 
-    <footer class="site-footer" role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <p class="footer-copy">&copy; 2026 Made by Faisal Yousaf, student of Eman Educational Complex</p>
-            </div>
-        </div>
-    </footer>
+        <!-- Slides will be injected by JavaScript -->
+    </div>
 
-    <script src="students.js"></script>
-    <script src="app.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            // Each slide duration in milliseconds
+            const SLIDE_DURATIONS = [
+                3500,   // 0 – Opening title
+                4500,   // 1 – Principal
+                4000,   // 2 – School Purpose / Islam
+                4000,   // 3 – Discipline
+                4000,   // 4 – Education
+                4000,   // 5 – Environment
+                3000,   // 6 – Teachers
+                2500    // 7 – Brief hold before redirect (shown empty, then redirect)
+            ];
+            // Total: ~34.5s, but we'll redirect after last slide + brief hold
+
+            // ---------- DATA ----------
+            const slidesData = [
+                {
+                    type: 'opening',
+                    html: `
+                        <div class="slide slide-opening active">
+                            <div class="logo-wrapper">
+                                <img src="logo.jpg" alt="Eman Educational Complex logo" onerror="this.style.display='none';" />
+                            </div>
+                            <div class="title-main">EMAN EDUCATIONAL COMPLEX</div>
+                            <div class="title-sub">Excellence · Discipline · Character</div>
+                            <div class="accent-line"></div>
+                        </div>
+                    `
+                },
+                {
+                    type: 'principal',
+                    name: 'Mustain Hasnain Shah',
+                    title: 'Principal',
+                    imgSrc: 'images/principal.jpg' // adjust if needed – fallback provided
+                },
+                {
+                    type: 'doc',
+                    heading: 'Purpose & Identity',
+                    text: 'To promote Islam, cultivate love for the Prophet Muhammad ﷺ, and build character through discipline and good manners.'
+                },
+                {
+                    type: 'doc',
+                    heading: 'Discipline',
+                    text: 'Respect for elders, kindness to the young, and responsibility towards all – these are the foundations of our learning culture.'
+                },
+                {
+                    type: 'doc',
+                    heading: 'Education',
+                    text: 'Quality education is our constant pursuit. We teach with care, and sometimes with strictness, to ensure real understanding.'
+                },
+                {
+                    type: 'doc',
+                    heading: 'Environment',
+                    text: 'A supportive, nurturing environment where every student feels safe, inspired, and motivated to grow.'
+                },
+                {
+                    type: 'doc',
+                    heading: 'Teachers',
+                    text: 'Dedicated teachers who guide, correct, and encourage – shaping the leaders of tomorrow.'
+                }
+            ];
+
+            // ---------- RENDER SLIDES ----------
+            const scene = document.getElementById('scene');
+            const slideElements = [];
+
+            slidesData.forEach((slide, index) => {
+                let html;
+                if (slide.type === 'opening') {
+                    html = slide.html;
+                } else if (slide.type === 'doc') {
+                    html = `
+                        <div class="slide slide-doc">
+                            <div class="doc-heading">${slide.heading}</div>
+                            <div class="doc-text">${slide.text}</div>
+                        </div>
+                    `;
+                } else if (slide.type === 'principal') {
+                    html = `
+                        <div class="slide slide-doc slide-principal">
+                            <div class="principal-photo-wrapper">
+                                <img src="${slide.imgSrc}" alt="${slide.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'fallback\\'>MS</div>';" />
+                            </div>
+                            <div class="principal-name">${slide.name}</div>
+                            <div class="principal-title">${slide.title}</div>
+                        </div>
+                    `;
+                }
+                // Create wrapper and slide element
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                const slideEl = wrapper.firstElementChild;
+                // Initially only first slide active
+                if (index !== 0) {
+                    slideEl.classList.remove('active');
+                } else {
+                    slideEl.classList.add('active');
+                }
+                scene.appendChild(slideEl);
+                slideElements.push(slideEl);
+            });
+
+            // ---------- PLAY SEQUENCE ----------
+            let currentIndex = 0;
+            let timer = null;
+            let redirectTimer = null;
+
+            function goToSlide(index) {
+                // Exit current
+                if (currentIndex < slideElements.length) {
+                    slideElements[currentIndex].classList.remove('active');
+                    slideElements[currentIndex].classList.add('exit');
+                }
+                // Enter new
+                if (index < slideElements.length) {
+                    slideElements[index].classList.remove('exit');
+                    slideElements[index].classList.add('active');
+                }
+                currentIndex = index;
+            }
+
+            function nextSlide() {
+                const next = currentIndex + 1;
+                if (next < slideElements.length) {
+                    goToSlide(next);
+                    // Schedule next after its duration
+                    timer = setTimeout(nextSlide, SLIDE_DURATIONS[next] || 3000);
+                } else {
+                    // All slides shown: wait a moment then redirect
+                    if (redirectTimer) clearTimeout(redirectTimer);
+                    redirectTimer = setTimeout(function() {
+                        window.location.href = 'list.html';
+                    }, 1500);
+                }
+            }
+
+            // Start: first slide active; schedule next after its duration
+            timer = setTimeout(nextSlide, SLIDE_DURATIONS[0] || 3000);
+
+            // Cleanup timers if user leaves (optional)
+            window.addEventListener('beforeunload', function() {
+                if (timer) clearTimeout(timer);
+                if (redirectTimer) clearTimeout(redirectTimer);
+            });
+
+            // Also handle if user presses back – we want to restart intro if they return
+            // (by default it will, as it's a new page load)
+
+        })();
+    </script>
+
 </body>
 </html>

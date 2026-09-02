@@ -125,12 +125,12 @@
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         if (!id) {
-            window.location.href = 'index.html';
+            window.location.href = 'list.html';
             return;
         }
         const student = students.find(s => s.id === id);
         if (!student) {
-            window.location.href = 'index.html';
+            window.location.href = 'list.html';
             return;
         }
         currentStudent = student;
@@ -201,13 +201,13 @@
 
     // Event listeners
     backBtn.addEventListener('click', function() {
-        window.location.href = 'index.html';
+        window.location.href = 'list.html';
     });
 
     document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft') { navigate(-1); e.preventDefault(); }
         else if (e.key === 'ArrowRight') { navigate(1); e.preventDefault(); }
-        else if (e.key === 'Escape') { window.location.href = 'index.html'; e.preventDefault(); }
+        else if (e.key === 'Escape') { window.location.href = 'list.html'; e.preventDefault(); }
     });
 
     // Swipe (touch & mouse)
