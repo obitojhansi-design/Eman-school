@@ -107,7 +107,7 @@ const students = [
         className: "9th",
         rollNumber: "266903",
         totalMarks: 555,
-        obtainedMarks: null,
+        obtainedMarks: 225,
         role: "The Teaser",
         intro: "The teaser — but we can't help laughing at his jokes.",
         image: "images/ali-shoaib.webp"
