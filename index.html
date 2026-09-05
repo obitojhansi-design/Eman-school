@@ -2,401 +2,391 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Eman Educational Complex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Eman Educational Complex · Home</title>
+     <link rel="icon" href="logo.png" type="image/png" />
 
-    <!-- Fonts (consistent with main project) -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
 
+    <link rel="stylesheet" href="style.css" />
+
     <style>
-        /* --- Reset & Base --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0b0b0b;
-            color: #f0f0f0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(ellipse at 30% 40%, rgba(91, 140, 90, 0.06) 0%, transparent 70%),
-                        radial-gradient(ellipse at 70% 80%, rgba(91, 140, 90, 0.03) 0%, transparent 60%),
-                        #0b0b0b;
-        }
-
-        /* --- Main Container with Perspective --- */
-        .scene {
-            position: relative;
+        /* ── Loading screen ── */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 1000px;
-            height: 100vh;
-            max-height: 800px;
-            perspective: 1200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        /* --- Slide Container (each slide is a "scene" in the journey) --- */
-        .slide {
-            position: absolute;
-            width: 100%;
-            max-width: 720px;
-            padding: 1.2rem 1.8rem;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(30px) scale(0.92);
-            transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1),
-                        transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
-            pointer-events: none;
-            will-change: transform, opacity;
-        }
-
-        .slide.active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
-        .slide.exit {
-            opacity: 0;
-            transform: translateY(-40px) scale(0.96);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        /* --- Opening Title Slide --- */
-        .slide-opening .title-main {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.1rem, 8vw, 1.6rem);
-            font-weight: 700;
-            letter-spacing: -0.0em;
-            color: #f5f5f5;
-            line-height: 1.0;
-            white-space: normal;      /* force one line */
-        }
-
-        .slide-opening .title-sub {
-            font-family: 'Inter', sans-serif;
-            font-size: clamp(0.5rem, 3vw, 1.2rem);
-            font-weight: 300;
-            color: #8a8a8a;
-            letter-spacing: 0.08em;
-            margin-top: 0.6rem;
-            opacity: 0.7;
-        }
-
-        .slide-opening .accent-line {
-            width: 60px;
-            height: 2px;
-            background: #5b8c5a;
-            margin: 1.2rem auto 0;
-            opacity: 0.4;
-        }
-
-        /* --- Documentary Slides --- */
-        .slide-doc .doc-heading {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.4rem, 4vw, 2.6rem);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: #5b8c5a;
-            margin-bottom: 0.6rem;
-        }
-
-        .slide-doc .doc-text {
-            font-family: 'Inter', sans-serif;
-            font-size: clamp(0.95rem, 2vw, 1.3rem);
-            font-weight: 300;
-            line-height: 1.7;
-            color: #c8c8c8;
-            max-width: 38ch;
-            margin: 0 auto;
-        }
-
-        /* --- Principal Slide (with photo) --- */
-        .slide-principal {
+            height: 100%;
+            background: var(--color-bg-primary);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
-        }
-
-        .principal-photo-wrapper {
-            width: 140px;
-            height: 140px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid rgba(91, 140, 90, 0.25);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-            background: #1c1c1c;
-            flex-shrink: 0;
-        }
-
-        .principal-photo-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .principal-photo-wrapper .fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: #5b8c5a;
-            background: #161616;
-            opacity: 0.4;
-        }
-
-        .principal-name {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-            font-weight: 700;
-            color: #f5f5f5;
-        }
-
-        .principal-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: #8a8a8a;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-top: -0.2rem;
-        }
-
-        /* --- Logo integration (in opening slide) --- */
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.2rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .logo-wrapper img {
-            height: 50px;
-            width: auto;
-            display: block;
-        }
-
-        /* --- Responsive adjustments --- */
-        @media (max-width: 600px) {
-            .scene { padding: 0.8rem; max-height: 100vh; }
-            .slide { padding: 0.8rem 1rem; max-width: 100%; }
-            .principal-photo-wrapper { width: 100px; height: 100px; }
-            .slide-opening .title-main { font-size: clamp(1.4rem, 10vw, 2.2rem); }
-            .logo-wrapper img { height: 36px; }
-        }
-
-        @media (max-width: 400px) {
-            .slide-opening .title-main { font-size: clamp(1.1rem, 8vw, 1.6rem); }
-            .principal-photo-wrapper { width: 80px; height: 80px; }
-        }
-
-        /* --- Subtle grain overlay (lightweight) --- */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBudW1PY3RhdmVzPSI0IiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wNCIgLz48L3N2Zz4=');
-            background-repeat: repeat;
-            opacity: 0.15;
-            mix-blend-mode: overlay;
             z-index: 9999;
+            transition: opacity 0.6s ease;
         }
-
-        /* --- Small abstract decorative lines for cinematic feel (optional) --- */
-        .deco-line {
-            position: absolute;
-            background: rgba(91, 140, 90, 0.08);
-            border-radius: 2px;
+        #loading.hidden {
+            opacity: 0;
             pointer-events: none;
         }
-        .deco-line-1 { width: 200px; height: 1px; top: 10%; left: 5%; transform: rotate(-5deg); }
-        .deco-line-2 { width: 150px; height: 1px; bottom: 15%; right: 8%; transform: rotate(4deg); }
-        @media (max-width: 600px) {
-            .deco-line { display: none; }
+        #loading .loading-logo {
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            /* No border, no border-radius, no circular crop */
+        }
+        #loading .loading-name {
+            margin-top: 16px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--color-text-heading);
+            letter-spacing: 0.04em;
+        }
+        #loading .loading-brand {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            color: var(--color-text-muted);
+            opacity: 0.4;
+            font-weight: 400;
+        }
+
+        /* ── Updated Contact Section ── */
+        .contact-section {
+            background: var(--color-bg-secondary);
+            padding: var(--space-3xl) 0;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .contact-map {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            height: 300px;
+            background: var(--color-bg-card);
+        }
+
+        .contact-map iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        .contact-info h2 {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            color: var(--color-text-heading);
+            margin-bottom: var(--space-lg);
+        }
+
+        .contact-info h2 .accent {
+            color: var(--color-green-accent);
+            font-style: italic;
+        }
+
+        .contact-info .info-item {
+            margin-bottom: var(--space-md);
+        }
+
+        .contact-info .info-item .label {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--color-text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .contact-info .info-item .value {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        .contact-info .info-item .value .phone {
+            font-family: var(--font-sans);
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .contact-map {
+                height: 220px;
+            }
+            .contact-info {
+                text-align: center;
+            }
+            /* On mobile, show info first then map */
+            .contact-grid .contact-info {
+                order: 1;
+            }
+            .contact-grid .contact-map {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #loading .loading-logo {
+                width: 80px;
+            }
+            #loading .loading-name {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="scene" id="scene">
-        <!-- Abstract decorative lines -->
-        <div class="deco-line deco-line-1"></div>
-        <div class="deco-line deco-line-2"></div>
-
-        <!-- Slides will be injected by JavaScript -->
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="loading">
+        <img src="logo.png" alt="Eman Educational Complex" class="loading-logo" />
+        <div class="loading-name">Eeman Educational Complex</div>
+        <div class="loading-brand">Powered by Pixelnex</div>
     </div>
 
+    <!-- ===== HEADER ===== -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-brand">
+                    <a href="index.html" class="brand-link">
+                        <img src="logo.png" alt="Eman Educational Complex" class="logo-image" />
+                        <span class="brand-name">EMAN</span>
+                    </a>
+                </div>
+                <nav class="header-nav" aria-label="Main navigation">
+                    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="active">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="academics.html">Academics</a></li>
+                        <li><a href="administration.html">Administration</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="highlight">EMAN</span>
+                    <span class="title-secondary">EDUCATIONAL COMPLEX</span>
+                </h1>
+            
+                <p class="hero-sub">Excellence · Discipline · Character</p>
+                <p class="hero-desc">
+                    Nurturing young minds with quality education and Islamic values.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="about.html" class="btn btn-primary">Learn More</a>
+                    <a href="index.html#contact" class="btn btn-light">Contact Us</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- Optional additional content -->
+            </div>
+        </div>
+        <div class="hero-accent"></div>
+    </section>
+
+    <!-- ===== ABOUT PREVIEW ===== -->
+    <section class="section about-preview" id="about">
+        <div class="container">
+            <div class="preview-content">
+                <div class="preview-text">
+                    <h2 class="section-title">About <span class="accent">Us</span></h2>
+                    <p>
+                        Eman Educational Complex is dedicated to providing quality education rooted in Islamic values. We nurture children with knowledge, discipline, and love for the Prophet Muhammad ﷺ, preparing them for a life of purpose and integrity.
+                    </p>
+                    <a href="about.html" class="preview-link">Discover about us →</a>
+                </div>
+                <div class="preview-image">
+                    <img src="school.jfif" alt="School identity" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MISSION & VISION ===== -->
+    <section class="section" id="mission">
+        <div class="container">
+            <h2 class="section-title">Mission &amp; <span class="accent">Vision</span></h2>
+            <div class="mission-grid">
+                <div class="col">
+                    <h3>Our Mission</h3>
+                    <p>
+                        To promote Islam, provide quality education, and connect children with Islamic values. We aim to develop love for the Prophet Muhammad ﷺ and increase understanding and knowledge of Islam in every student.
+                    </p>
+                </div>
+                <div class="col">
+                    <h3>Our Vision</h3>
+                    <p>
+                        To create a generation of confident, knowledgeable, and ethically grounded individuals who contribute positively to society while remaining firmly rooted in their faith and traditions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== VALUES ===== -->
+    <section class="section" id="values">
+        <div class="container">
+            <h2 class="section-title">What We <span class="accent">Stand For</span></h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <span class="icon">📖</span>
+                    <h4>Quality Education</h4>
+                    <p>Focus on understanding and real learning, not just memorisation.</p>
+                </div>
+                <div class="value-item">
+                    <span class="icon">🕌</span>
+                    <h4>Islamic Values</h4>
+                    <p>Integrating Islamic teachings and love for the Prophet ﷺ in daily learning.</p>
+                </div>
+                <div class="value-item">
+                    <span class="icon">🤝</span>
+                    <h4>Discipline &amp; Character</h4>
+                    <p>Respect, responsibility, and good manners are at the core of our culture.</p>
+                </div>
+                <div class="value-item">
+                    <span class="icon">🌱</span>
+                    <h4>Supportive Environment</h4>
+                    <p>A nurturing space where every child feels safe, inspired, and motivated.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== UPDATED CONTACT SECTION ===== -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <!-- Left: Contact Info -->
+                <div class="contact-info">
+                    <h2>Get in <span class="accent">Touch</span></h2>
+                    <div class="info-item">
+                        <span class="label">School</span>
+                        <span class="value">Eman Educational Complex</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Address</span>
+                        <span class="value">
+                            قبولہ روڈ، گلشن وہاب فیز ون، عارف والا<br />
+                            (Qaboola Road, Gulshan Wahab Phase 1, Arifwala)
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Phone</span>
+                        <span class="value phone">Will be added soon</span>
+                    </div>
+                </div>
+                <!-- Right: Map -->
+                <div class="contact-map">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d638.1884429062917!2d73.06892974586916!3d30.27855323366505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sus!4v1788581907691!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"> 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Eman Educational Complex Location">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="logo.png" alt="Eman Educational Complex" class="footer-logo" />
+                    <span class="footer-school">Eman Educational Complex</span>
+                </div>
+                <div class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html" class="active">About</a></li>
+                        <li><a href="academics.html">Academics</a></li>
+                        <li><a href="administration.html">Administration</a></li>
+                </div>
+                <p class="footer-copy">&copy; 2026 Eman Educational Complex</p>
+                <p>made with ❤️ by <a href="https://pixlnex.vercel.app" target="_blank">Pixlnex</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
     <script>
-        (function() {
-            'use strict';
+        // Loading screen
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('loading').classList.add('hidden');
+            }, 600);
+        });
 
-            // ---------- CONFIG ----------
-            // Each slide duration in milliseconds
-            const SLIDE_DURATIONS = [
-                3500,   // 0 – Opening title
-                4500,   // 1 – Principal
-                4000,   // 2 – School Purpose / Islam
-                4000,   // 3 – Discipline
-                4000,   // 4 – Education
-                4000,   // 5 – Environment
-                3000,   // 6 – Teachers
-                2500    // 7 – Brief hold before redirect (shown empty, then redirect)
-            ];
-            // Total: ~34.5s, but we'll redirect after last slide + brief hold
+        // Mobile nav toggle
+        document.querySelector('.nav-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav-menu').classList.toggle('open');
+            const expanded = this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true';
+            this.setAttribute('aria-expanded', expanded);
+        });
 
-            // ---------- DATA ----------
-            const slidesData = [
-                {
-                    type: 'opening',
-                    html: `
-                        <div class="slide slide-opening active">
-                            <div class="logo-wrapper">
-                                <img src="logo.jpg" alt="Eman Educational Complex logo" onerror="this.style.display='none';" />
-                            </div>
-                            <div class="title-main">EMAN EDUCATIONAL COMPLEX</div>
-                            <div class="title-sub">Excellence · Discipline · Character</div>
-                            <div class="accent-line"></div>
-                        </div>
-                    `
-                },
-                {
-                    type: 'principal',
-                    name: 'Mustain Hasnain Shah',
-                    title: 'Principal',
-                    imgSrc: 'images/principal.jpeg' // adjust if needed – fallback provided
-                },
-                {
-                    type: 'doc',
-                    heading: 'Purpose & Identity',
-                    text: 'To promote Islam, cultivate love for the Prophet Muhammad ﷺ, and build character through discipline and good manners.'
-                },
-                {
-                    type: 'doc',
-                    heading: 'Discipline',
-                    text: 'Respect for elders, kindness to the young, and responsibility towards all – these are the foundations of our learning culture.'
-                },
-                {
-                    type: 'doc',
-                    heading: 'Education',
-                    text: 'Quality education is our constant pursuit. We teach with care, and sometimes with strictness, to ensure real understanding.'
-                },
-                {
-                    type: 'doc',
-                    heading: 'Environment',
-                    text: 'A supportive, nurturing environment where every student feels safe, inspired, and motivated to grow.'
-                },
-                {
-                    type: 'doc',
-                    heading: 'Teachers',
-                    text: 'Dedicated teachers who guide, correct, and encourage – shaping the leaders of tomorrow.'
-                }
-            ];
-
-            // ---------- RENDER SLIDES ----------
-            const scene = document.getElementById('scene');
-            const slideElements = [];
-
-            slidesData.forEach((slide, index) => {
-                let html;
-                if (slide.type === 'opening') {
-                    html = slide.html;
-                } else if (slide.type === 'doc') {
-                    html = `
-                        <div class="slide slide-doc">
-                            <div class="doc-heading">${slide.heading}</div>
-                            <div class="doc-text">${slide.text}</div>
-                        </div>
-                    `;
-                } else if (slide.type === 'principal') {
-                    html = `
-                        <div class="slide slide-doc slide-principal">
-                            <div class="principal-photo-wrapper">
-                                <img src="${slide.imgSrc}" alt="${slide.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'fallback\\'>MS</div>';" />
-                            </div>
-                            <div class="principal-name">${slide.name}</div>
-                            <div class="principal-title">${slide.title}</div>
-                        </div>
-                    `;
-                }
-                // Create wrapper and slide element
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = html;
-                const slideEl = wrapper.firstElementChild;
-                // Initially only first slide active
-                if (index !== 0) {
-                    slideEl.classList.remove('active');
-                } else {
-                    slideEl.classList.add('active');
-                }
-                scene.appendChild(slideEl);
-                slideElements.push(slideEl);
+        // Close mobile nav on link click
+        document.querySelectorAll('.nav-menu a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.querySelector('.nav-toggle').classList.remove('active');
+                document.querySelector('.nav-menu').classList.remove('open');
+                document.querySelector('.nav-toggle').setAttribute('aria-expanded', 'false');
             });
+        });
 
-            // ---------- PLAY SEQUENCE ----------
-            let currentIndex = 0;
-            let timer = null;
-            let redirectTimer = null;
-
-            function goToSlide(index) {
-                // Exit current
-                if (currentIndex < slideElements.length) {
-                    slideElements[currentIndex].classList.remove('active');
-                    slideElements[currentIndex].classList.add('exit');
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const target = document.querySelector(targetId);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
                 }
-                // Enter new
-                if (index < slideElements.length) {
-                    slideElements[index].classList.remove('exit');
-                    slideElements[index].classList.add('active');
-                }
-                currentIndex = index;
-            }
-
-            function nextSlide() {
-                const next = currentIndex + 1;
-                if (next < slideElements.length) {
-                    goToSlide(next);
-                    // Schedule next after its duration
-                    timer = setTimeout(nextSlide, SLIDE_DURATIONS[next] || 3000);
-                } else {
-                    // All slides shown: wait a moment then redirect
-                    if (redirectTimer) clearTimeout(redirectTimer);
-                    redirectTimer = setTimeout(function() {
-                        window.location.href = 'list.html';
-                    }, 1500);
-                }
-            }
-
-            // Start: first slide active; schedule next after its duration
-            timer = setTimeout(nextSlide, SLIDE_DURATIONS[0] || 3000);
-
-            // Cleanup timers if user leaves (optional)
-            window.addEventListener('beforeunload', function() {
-                if (timer) clearTimeout(timer);
-                if (redirectTimer) clearTimeout(redirectTimer);
             });
-
-            // Also handle if user presses back – we want to restart intro if they return
-            // (by default it will, as it's a new page load)
-
-        })();
+        });
     </script>
 
 </body>
