@@ -3,258 +3,958 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="google-site-verification" content="4zGD_idMkRTh6-kf6KHytdwhp_4HickgSorEaVgBPwA" />
     <title>Eman Educational Complex · Home</title>
-     <link rel="icon" href="logo.png" type="image/png" />
+    <link rel="icon" href="logo.png" type="image/png" />
 
-    <!-- Fonts -->
+    <!-- Google Fonts: DM Serif Display + DM Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="style.css" />
 
     <style>
-        /* ── Loading screen ── */
+        /* ============================================================
+           Design Tokens
+           ============================================================ */
+        :root {
+            --color-dark-green:   #174B3A;
+            --color-parrot-green: #A9CDA0;
+            --color-ivory:        #F7F7F0;
+            --color-dark-text:    #26332D;
+            --color-white:        #FFFFFF;
+            --color-gold:         #C6A45C;
+
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+            --header-height:          72px;
+            --header-height-scrolled: 60px;
+
+            --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+            --transition: 0.3s var(--ease-out);
+        }
+
+        /* ============================================================
+           Reset & Base
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.65;
+            color: var(--color-dark-text);
+            background: var(--color-ivory);
+            overflow-x: hidden;
+        }
+
+        img { display: block; max-width: 100%; height: auto; }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            line-height: 1.15;
+            color: var(--color-dark-green);
+            letter-spacing: -0.01em;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============================================================
+           Loading Screen
+           ============================================================ */
         #loading {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--color-bg-primary);
+            inset: 0;
+            z-index: 9999;
+            background: var(--color-dark-green);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.7s ease;
         }
-        #loading.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #loading .loading-logo {
-            width: 120px;
-            height: auto;
-            object-fit: contain;
+        #loading.hidden { opacity: 0; pointer-events: none; }
+        .loader-content { text-align: center; }
+        .loader-logo {
+            height: 64px;
+            width: auto;
+            margin: 0 auto 16px;
             display: block;
-            /* No border, no border-radius, no circular crop */
         }
-        #loading .loading-name {
-            margin-top: 16px;
-            font-family: var(--font-serif);
-            font-weight: 700;
-            font-size: 1.6rem;
-            color: var(--color-text-heading);
-            letter-spacing: 0.04em;
+        .loader-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--color-ivory);
+            letter-spacing: 0.02em;
         }
-        #loading .loading-brand {
-            position: absolute;
-            bottom: 30px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-family: var(--font-sans);
-            font-size: 0.7rem;
-            letter-spacing: 0.12em;
-            color: var(--color-text-muted);
-            opacity: 0.4;
+
+        /* ============================================================
+           Header
+           ============================================================ */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--color-ivory);
+            border-bottom: 1px solid rgba(23, 75, 58, 0.12);
+            transition: box-shadow var(--transition), border-color var(--transition);
+        }
+        .site-header.scrolled {
+            box-shadow: 0 2px 16px rgba(23, 75, 58, 0.08);
+            border-bottom-color: transparent;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: var(--header-height);
+            transition: height var(--transition);
+        }
+        .site-header.scrolled .header-content {
+            height: var(--header-height-scrolled);
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-brand .logo-image {
+            height: 42px;
+            width: auto;
+            transition: height var(--transition);
+        }
+        .site-header.scrolled .header-brand .logo-image {
+            height: 36px;
+        }
+        .brand-name {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
             font-weight: 400;
+            color: var(--color-dark-green);
+            letter-spacing: 0.01em;
+            line-height: 1.1;
+        }
+        .brand-name small {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-dark-text);
+            opacity: 0.65;
+            margin-top: 2px;
         }
 
-        /* ── Updated Contact Section ── */
-        .contact-section {
-            background: var(--color-bg-secondary);
-            padding: var(--space-3xl) 0;
+        /* Desktop nav */
+        .nav-desktop {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav-desktop a {
+            position: relative;
+            padding: 8px 16px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--color-dark-green);
+            letter-spacing: 0.01em;
+            transition: color var(--transition);
+        }
+        .nav-desktop a:hover { color: var(--color-dark-text); }
+        .nav-desktop a::after {
+            content: '';
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 0;
+            height: 2px;
+            background: var(--color-dark-green);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition);
+        }
+        .nav-desktop a:hover::after,
+        .nav-desktop a.active::after { transform: scaleX(1); }
+        .nav-desktop a.active { font-weight: 600; }
+
+        /* Mobile toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            padding: 8px;
+            color: var(--color-dark-green);
+        }
+        .nav-toggle svg {
+            width: 24px;
+            height: 24px;
+            display: block;
         }
 
-        .contact-grid {
+        /* ============================================================
+           Mobile Drawer
+           ============================================================ */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(38, 51, 45, 0.4);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition), visibility var(--transition);
+            z-index: 998;
+        }
+        .drawer-overlay.open { opacity: 1; visibility: visible; }
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 82%;
+            max-width: 340px;
+            background: var(--color-ivory);
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--ease-out);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 32px rgba(23, 75, 58, 0.12);
+        }
+        .drawer.open { transform: translateX(0); }
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(23, 75, 58, 0.1);
+        }
+        .drawer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .drawer-brand img { height: 32px; }
+        .drawer-brand span {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--color-dark-green);
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            padding: 6px;
+            color: var(--color-dark-green);
+        }
+        .drawer-close svg { width: 22px; height: 22px; }
+        .drawer-nav {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+        }
+        .drawer-nav a {
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-dark-text);
+            border-left: 3px solid transparent;
+            transition: background var(--transition), border-color var(--transition);
+        }
+        .drawer-nav a:hover,
+        .drawer-nav a.active {
+            background: rgba(169, 205, 160, 0.18);
+            border-left-color: var(--color-dark-green);
+            color: var(--color-dark-green);
+        }
+
+        /* ============================================================
+           Hero
+           ============================================================ */
+        .hero {
+            background: var(--color-ivory);
+            padding: 80px 0 96px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            max-width: 1100px;
-            margin: 0 auto;
+            gap: 64px;
             align-items: center;
         }
-
-        .contact-map {
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            height: 300px;
-            background: var(--color-bg-card);
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-dark-green);
+            margin-bottom: 20px;
         }
-
-        .contact-map iframe {
+        .hero-eyebrow::before {
+            content: '';
+            width: 28px;
+            height: 1px;
+            background: var(--color-gold);
+        }
+        .hero-title {
+            font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+            line-height: 1.08;
+            color: var(--color-dark-green);
+            margin-bottom: 24px;
+        }
+        .hero-title em {
+            font-style: italic;
+            color: var(--color-dark-green);
+            opacity: 0.85;
+        }
+        .hero-desc {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--color-dark-text);
+            max-width: 52ch;
+            margin-bottom: 32px;
+            opacity: 0.85;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 26px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            border-radius: 4px;
+            border: 1.5px solid transparent;
+            transition: all var(--transition);
+        }
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            transition: transform var(--transition);
+        }
+        .btn:hover svg { transform: translateX(3px); }
+        .btn-primary {
+            background: var(--color-dark-green);
+            color: var(--color-ivory);
+            border-color: var(--color-dark-green);
+        }
+        .btn-primary:hover {
+            background: #0f3628;
+            border-color: #0f3628;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-dark-green);
+            border-color: rgba(23, 75, 58, 0.35);
+        }
+        .btn-secondary:hover {
+            border-color: var(--color-dark-green);
+            background: rgba(169, 205, 160, 0.15);
+        }
+        .hero-visual { position: relative; }
+        .hero-image-frame {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 4 / 5;
+            background: rgba(169, 205, 160, 0.2);
+            box-shadow: 0 24px 60px -20px rgba(23, 75, 58, 0.25);
+        }
+        .hero-image-frame img {
             width: 100%;
             height: 100%;
-            border: 0;
-            display: block;
+            object-fit: cover;
+        }
+        .hero-image-frame .image-fallback {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--color-dark-green);
+            opacity: 0.25;
+            letter-spacing: 0.02em;
+        }
+        .hero-image-accent {
+            position: absolute;
+            top: -16px;
+            left: -16px;
+            width: 96px;
+            height: 96px;
+            border-top: 3px solid var(--color-gold);
+            border-left: 3px solid var(--color-gold);
+            border-top-left-radius: 6px;
+            z-index: 2;
+            pointer-events: none;
         }
 
-        .contact-info h2 {
-            font-family: var(--font-serif);
-            font-weight: 700;
-            font-size: clamp(1.8rem, 3vw, 2.4rem);
-            color: var(--color-text-heading);
-            margin-bottom: var(--space-lg);
-        }
-
-        .contact-info h2 .accent {
-            color: var(--color-green-accent);
-            font-style: italic;
-        }
-
-        .contact-info .info-item {
-            margin-bottom: var(--space-md);
-        }
-
-        .contact-info .info-item .label {
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 0.75rem;
+        /* ============================================================
+           Sections (shared)
+           ============================================================ */
+        .section { padding: 88px 0; }
+        .section--alt { background: var(--color-white); }
+        .section-eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--color-text-muted);
+            color: var(--color-dark-green);
+            margin-bottom: 14px;
+            opacity: 0.75;
+        }
+        .section-title {
+            font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+            line-height: 1.15;
+            color: var(--color-dark-green);
+            margin-bottom: 20px;
+        }
+        .section-lead {
+            font-size: 1.02rem;
+            line-height: 1.75;
+            color: var(--color-dark-text);
+            max-width: 62ch;
+            opacity: 0.85;
+        }
+
+        /* ============================================================
+           About
+           ============================================================ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: center;
+        }
+        .about-image {
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 5 / 4;
+            background: rgba(169, 205, 160, 0.2);
+        }
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .about-text p {
+            color: var(--color-dark-text);
+            opacity: 0.85;
+            margin-bottom: 18px;
+            line-height: 1.75;
+        }
+        .link-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            color: var(--color-dark-green);
+            border-bottom: 1px solid rgba(23, 75, 58, 0.3);
+            padding-bottom: 2px;
+            transition: gap var(--transition), border-color var(--transition);
+        }
+        .link-inline:hover {
+            gap: 10px;
+            border-bottom-color: var(--color-dark-green);
+        }
+        .link-inline svg { width: 14px; height: 14px; }
+
+        /* ============================================================
+           Mission / Vision
+           ============================================================ */
+        .mv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid rgba(23, 75, 58, 0.12);
+            border-bottom: 1px solid rgba(23, 75, 58, 0.12);
+            margin-top: 40px;
+        }
+        .mv-col {
+            padding: 40px 40px 40px 0;
+            border-right: 1px solid rgba(23, 75, 58, 0.12);
+        }
+        .mv-col:last-child {
+            padding: 40px 0 40px 40px;
+            border-right: none;
+        }
+        .mv-col h3 {
+            font-size: 1.5rem;
+            color: var(--color-dark-green);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mv-col h3::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-gold);
+            border-radius: 50%;
+        }
+        .mv-col p {
+            color: var(--color-dark-text);
+            opacity: 0.82;
+            line-height: 1.75;
+        }
+
+        /* ============================================================
+           Academics / Values
+           ============================================================ */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid rgba(23, 75, 58, 0.12);
+            margin-top: 40px;
+            
+        }
+        .value-item {
+            padding: 36px 24px 36px 0;
+            border-right: 1px solid rgba(23, 75, 58, 0.12);
+            background:#174b3a70;
+        }
+        .value-item:first-child { padding-left: 0; }
+        .value-item:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+        .value-item .icon-box {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(247, 247, 247, 0.25);
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+        .value-item .icon-box img { width: 22px; height: 22px; }
+        .value-item h4 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            color: var(--color-dark-green);
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+        .value-item p {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: var(--color-dark-text);
+            opacity: 0.75;
+        }
+
+        /* ============================================================
+           Administration
+           ============================================================ */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 56px;
+            align-items: center;
+            margin-top: 32px;
+        }
+        .admin-photo {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 3 / 4;
+            background: rgba(169, 205, 160, 0.2);
+            box-shadow: 0 20px 50px -16px rgba(23, 75, 58, 0.2);
+        }
+        .admin-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .admin-photo .photo-fallback {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            color: var(--color-dark-green);
+            opacity: 0.3;
+        }
+        .admin-info .admin-role {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-gold);
+            margin-bottom: 12px;
+        }
+        .admin-info h3 {
+            font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+            color: var(--color-dark-green);
+            margin-bottom: 16px;
+        }
+        .admin-info p {
+            color: var(--color-dark-text);
+            opacity: 0.82;
+            line-height: 1.75;
+            max-width: 52ch;
+        }
+
+        /* ============================================================
+           Contact
+           ============================================================ */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 64px;
+            align-items: start;
+            margin-top: 40px;
+        }
+        .contact-info {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .contact-info li {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .contact-info .ci-icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(169, 205, 160, 0.25);
+            border-radius: 8px;
+        }
+        .contact-info .ci-icon img { width: 18px; height: 18px; }
+        .contact-info .ci-text strong {
             display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-dark-green);
             margin-bottom: 2px;
         }
-
-        .contact-info .info-item .value {
-            font-family: var(--font-serif);
-            font-size: 1.1rem;
-            color: var(--color-text-primary);
-            line-height: 1.5;
+        .contact-info .ci-text span {
+            font-size: 0.98rem;
+            color: var(--color-dark-text);
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+        .contact-info .ci-text em {
+            font-style: normal;
+            color: var(--color-dark-text);
+            opacity: 0.55;
+        }
+        .contact-note {
+            padding: 28px;
+            background: var(--color-ivory);
+            border-left: 3px solid var(--color-gold);
+            border-radius: 4px;
+        }
+        .contact-note p {
+            font-size: 0.95rem;
+            color: var(--color-dark-text);
+            opacity: 0.8;
+            line-height: 1.7;
         }
 
-        .contact-info .info-item .value .phone {
-            font-family: var(--font-sans);
-            font-weight: 500;
+        /* ============================================================
+           Footer
+           ============================================================ */
+        .site-footer {
+            background: var(--color-dark-green);
+            color: var(--color-ivory);
+            padding: 56px 0 28px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 48px;
+            align-items: start;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(247, 247, 240, 0.15);
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .footer-brand img { height: 40px; }
+        .footer-brand span {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            color: var(--color-ivory);
+        }
+        .footer-tagline {
+            font-size: 0.92rem;
+            color: rgba(247, 247, 240, 0.7);
+            line-height: 1.65;
+            max-width: 40ch;
+        }
+        .footer-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .footer-nav a {
+            font-size: 0.9rem;
+            color: rgba(247, 247, 240, 0.75);
+            transition: color var(--transition);
+        }
+        .footer-nav a:hover { color: var(--color-parrot-green); }
+        .footer-bottom {
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: rgba(247, 247, 240, 0.55);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .contact-grid {
+        /* ============================================================
+           Responsive
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .hero-grid,
+            .about-grid {
                 grid-template-columns: 1fr;
-                gap: 30px;
+                gap: 48px;
             }
-            .contact-map {
-                height: 220px;
+            .hero-visual { order: -1; max-width: 480px; }
+            .about-image { max-width: 480px; }
+            .values-grid { grid-template-columns: repeat(2, 1fr); }
+            .value-item {
+                padding: 32px 24px;
+                border-bottom: 1px solid rgba(23, 75, 58, 0.12);
             }
-            .contact-info {
-                text-align: center;
+            .value-item:nth-child(2n) { border-right: none; }
+            .value-item:nth-child(n+3) { border-bottom: none; }
+            .admin-grid { grid-template-columns: 260px 1fr; gap: 36px; }
+            .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .nav-desktop { display: none; }
+            .nav-toggle { display: block; }
+
+            .hero { padding: 48px 0 64px; }
+            .section { padding: 64px 0; }
+
+            .mv-grid { grid-template-columns: 1fr; }
+            .mv-col {
+                padding: 28px 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(23, 75, 58, 0.12);
             }
-            /* On mobile, show info first then map */
-            .contact-grid .contact-info {
-                order: 1;
+            .mv-col:last-child { padding: 28px 0; border-bottom: none; }
+
+            .values-grid { grid-template-columns: 1fr; }
+            .value-item {
+                border-right: none !important;
+                border-bottom: 1px solid rgba(23, 75, 58, 0.12) !important;
+                padding: 28px 0 !important;
             }
-            .contact-grid .contact-map {
-                order: 2;
-            }
+            .value-item:last-child { border-bottom: none !important; }
+
+            .admin-grid { grid-template-columns: 1fr; gap: 32px; }
+            .admin-photo { max-width: 280px; }
+
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: column; text-align: center; }
         }
 
         @media (max-width: 480px) {
-            #loading .loading-logo {
-                width: 80px;
-            }
-            #loading .loading-name {
-                font-size: 1.2rem;
-            }
+            .hero-title { font-size: 2rem; }
+            .btn { padding: 12px 22px; font-size: 0.86rem; }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .btn { justify-content: center; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== LOADING SCREEN ===== -->
+    <!-- ============ LOADING ============ -->
     <div id="loading">
-        <img src="logo.png" alt="Eman Educational Complex" class="loading-logo" />
-        <div class="loading-name">Eeman Educational Complex</div>
-        <div class="loading-brand">Powered by Pixelnex</div>
+        <div class="loader-content">
+            <img src="logo.jpg" alt="Eman Educational Complex" class="loader-logo" onerror="this.style.display='none';" />
+            <div class="loader-name">Eman Educational Complex</div>
+        </div>
     </div>
 
-    <!-- ===== HEADER ===== -->
-    <header class="site-header" role="banner">
+    <!-- ============ HEADER ============ -->
+    <header class="site-header" id="siteHeader">
         <div class="container">
             <div class="header-content">
-                <div class="header-brand">
-                    <a href="index.html" class="brand-link">
-                        <img src="logo.png" alt="Eman Educational Complex" class="logo-image" />
-                        <span class="brand-name">EMAN</span>
-                    </a>
-                </div>
-                <nav class="header-nav" aria-label="Main navigation">
-                    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-                        <span></span><span></span><span></span>
-                    </button>
-                    <ul class="nav-menu">
-                        <li><a href="index.html" class="active">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="academics.html">Academics</a></li>
-                        <li><a href="administration.html">Administration</a></li>
-                    </ul>
+                <a href="index.html" class="header-brand">
+                    <img src="logo.png" alt="Eman Educational Complex" class="logo-image" onerror="this.style.display='none';" />
+                    <span class="brand-name">
+                        Eman Educational Complex
+                        <small>Arifwala</small>
+                    </span>
+                </a>
+
+                <nav class="nav-desktop" aria-label="Primary">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="academics.html">Academics</a>
+                    <a href="administration.html">Administration</a>
                 </nav>
+
+                <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- ===== HERO ===== -->
+    <!-- ============ MOBILE DRAWER ============ -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="drawer" id="drawer" aria-hidden="true">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="logo.png" alt="" onerror="this.style.display='none';" />
+                <span>Eman Complex</span>
+            </div>
+            <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-nav" aria-label="Mobile">
+            <a href="index.html" class="active">Home</a>
+            <a href="about.html">About</a>
+            <a href="academics.html">Academics</a>
+            <a href="administration.html">Administration</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </aside>
+
+    <!-- ============ HERO ============ -->
     <section class="hero" id="home">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="highlight">EMAN</span>
-                    <span class="title-secondary">EDUCATIONAL COMPLEX</span>
-                </h1>
-            
-                <p class="hero-sub">Excellence · Discipline · Character</p>
-                <p class="hero-desc">
-                    Nurturing young minds with quality education and Islamic values.
-                </p>
-                
-                <div class="hero-actions">
-                    <a href="about.html" class="btn btn-primary">Learn More</a>
-                    <a href="index.html#contact" class="btn btn-light">Contact Us</a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <!-- Optional additional content -->
-            </div>
-        </div>
-        <div class="hero-accent"></div>
-    </section>
-
-    <!-- ===== ABOUT PREVIEW ===== -->
-    <section class="section about-preview" id="about">
         <div class="container">
-            <div class="preview-content">
-                <div class="preview-text">
-                    <h2 class="section-title">About <span class="accent">Us</span></h2>
-                    <p>
-                        Eman Educational Complex is dedicated to providing quality education rooted in Islamic values. We nurture children with knowledge, discipline, and love for the Prophet Muhammad ﷺ, preparing them for a life of purpose and integrity.
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <span class="hero-eyebrow">Eman Educational Complex</span>
+                    <h1 class="hero-title">
+                        Nurturing knowledge,<br>
+                        <em>building character.</em>
+                    </h1>
+                    <p class="hero-desc">
+                        A school rooted in Islamic values, dedicated to providing quality education that shapes confident, principled, and curious young minds.
                     </p>
-                    <a href="about.html" class="preview-link">Discover about us →</a>
+                    <div class="hero-actions">
+                        <a href="about.html" class="btn btn-primary">
+                            Learn More
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                        <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+                    </div>
                 </div>
-                <div class="preview-image">
-                    <img src="school.jfif" alt="School identity" />
+                <div class="hero-visual">
+                    <div class="hero-image-accent" aria-hidden="true"></div>
+                    <div class="hero-image-frame">
+                        <img src="images/hero.jpg" alt="Books and academic environment" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="image-fallback">EMAN</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== MISSION & VISION ===== -->
+    <!-- ============ ABOUT ============ -->
+    <section class="section section--alt" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image">
+                    <img src="images/library.jpg" alt="School library with natural light" onerror="this.style.display='none';" />
+                </div>
+                <div class="about-text">
+                    <span class="section-eyebrow">About the School</span>
+                    <h2 class="section-title">A place of learning, faith and character.</h2>
+                    <p>
+                        Eman Educational Complex is dedicated to providing quality education rooted in Islamic values. We nurture children with knowledge, discipline, and love for the Prophet Muhammad ﷺ — preparing them for a life of purpose and integrity.
+                    </p>
+                    <p>
+                        Our approach blends rigorous academics with moral and spiritual development, ensuring every student grows intellectually and personally.
+                    </p>
+                    <a href="academics.html" class="link-inline">
+                        Explore our values
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ MISSION & VISION ============ -->
     <section class="section" id="mission">
         <div class="container">
-            <h2 class="section-title">Mission &amp; <span class="accent">Vision</span></h2>
-            <div class="mission-grid">
-                <div class="col">
+            <span class="section-eyebrow">Purpose &amp; Direction</span>
+            <h2 class="section-title">Our mission and vision.</h2>
+            <div class="mv-grid">
+                <div class="mv-col">
                     <h3>Our Mission</h3>
                     <p>
                         To promote Islam, provide quality education, and connect children with Islamic values. We aim to develop love for the Prophet Muhammad ﷺ and increase understanding and knowledge of Islam in every student.
                     </p>
                 </div>
-                <div class="col">
+                <div class="mv-col">
                     <h3>Our Vision</h3>
                     <p>
                         To create a generation of confident, knowledgeable, and ethically grounded individuals who contribute positively to society while remaining firmly rooted in their faith and traditions.
@@ -264,127 +964,178 @@
         </div>
     </section>
 
-    <!-- ===== VALUES ===== -->
-    <section class="section" id="values">
+    <!-- ============ ACADEMICS / VALUES ============ -->
+    <section class="section section--alt" id="academics">
         <div class="container">
-            <h2 class="section-title">What We <span class="accent">Stand For</span></h2>
+            <span class="section-eyebrow">Academics</span>
+            <h2 class="section-title">The foundations we build on.</h2>
+            <p class="section-lead">
+                Our academic approach pairs strong subject teaching with Islamic values and character formation.
+            </p>
             <div class="values-grid">
                 <div class="value-item">
-                    <span class="icon">📖</span>
+                    <div class="icon-box">
+                        <img src="assets/svg/book.svg" alt="" />
+                    </div>
                     <h4>Quality Education</h4>
                     <p>Focus on understanding and real learning, not just memorisation.</p>
                 </div>
                 <div class="value-item">
-                    <span class="icon">🕌</span>
+                    <div class="icon-box">
+                        <img src="assets/svg/mosque.svg" alt="" />
+                    </div>
                     <h4>Islamic Values</h4>
                     <p>Integrating Islamic teachings and love for the Prophet ﷺ in daily learning.</p>
                 </div>
                 <div class="value-item">
-                    <span class="icon">🤝</span>
+                    <div class="icon-box">
+                        <img src="assets/svg/handshake.svg" alt="" />
+                    </div>
                     <h4>Discipline &amp; Character</h4>
-                    <p>Respect, responsibility, and good manners are at the core of our culture.</p>
+                    <p>Respect, responsibility, and good manners at the core of our culture.</p>
                 </div>
                 <div class="value-item">
-                    <span class="icon">🌱</span>
+                    <div class="icon-box">
+                        <img src="assets/svg/leaf.svg" alt="" />
+                    </div>
                     <h4>Supportive Environment</h4>
-                    <p>A nurturing space where every child feels safe, inspired, and motivated.</p>
+                    <p>A nurturing space where every child feels safe and motivated.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== UPDATED CONTACT SECTION ===== -->
-    <section class="contact-section" id="contact">
+ 
+</section>
+
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section section--alt" id="contact">
         <div class="container">
+            <span class="section-eyebrow">Contact</span>
+            <h2 class="section-title">Visit or reach out.</h2>
             <div class="contact-grid">
-                <!-- Left: Contact Info -->
-                <div class="contact-info">
-                    <h2>Get in <span class="accent">Touch</span></h2>
-                    <div class="info-item">
-                        <span class="label">School</span>
-                        <span class="value">Eman Educational Complex</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Address</span>
-                        <span class="value">
-                            قبولہ روڈ، گلشن وہاب فیز ون، عارف والا<br />
-                            (Qaboola Road, Gulshan Wahab Phase 1, Arifwala)
-                        </span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Phone</span>
-                        <span class="value phone">Will be added soon</span>
-                    </div>
-                </div>
-                <!-- Right: Map -->
-                <div class="contact-map">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d638.1884429062917!2d73.06892974586916!3d30.27855323366505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sus!4v1788581907691!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"> 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Eman Educational Complex Location">
-                    </iframe>
+                <ul class="contact-info">
+                    <li>
+                        <div class="ci-icon"><img src="assets/svg/pin.svg" alt="" /></div>
+                        <div class="ci-text">
+                            <strong>Address</strong>
+                            <span>قبولہ روڈ، گلشن وہاب فیز ون، عارف والا<br>(Qaboola Road, Gulshan Wahab Phase 1, Arifwala)</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ci-icon"><img src="assets/svg/phone.svg" alt="" /></div>
+                        <div class="ci-text">
+                            <strong>Phone</strong>
+                            <span><em>0322 6060722
+                            </em></span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ci-icon"><img src="assets/svg/mail.svg" alt="" /></div>
+                        <div class="ci-text">
+                            <strong>Email</strong>
+                            <span><em>Not yet available</em></span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="contact-note">
+                    <p>
+                        For admissions, general queries, or to schedule a visit, please contact the school office. Full contact details will be published shortly.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="site-footer" role="contentinfo">
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <img src="logo.png" alt="Eman Educational Complex" class="footer-logo" />
-                    <span class="footer-school">Eman Educational Complex</span>
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <img src="logo.jpg" alt="Eman Educational Complex" onerror="this.style.display='none';" />
+                        <span>Eman Educational Complex</span>
+                    </div>
+                    <p class="footer-tagline">
+                        Nurturing knowledge, faith and character — building a generation rooted in Islamic values.
+                    </p>
                 </div>
-                <div class="footer-links">
-                    <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html" class="active">About</a></li>
-                        <li><a href="academics.html">Academics</a></li>
-                        <li><a href="administration.html">Administration</a></li>
-                </div>
-                <p class="footer-copy">&copy; 2026 Eman Educational Complex</p>
-                <p>made with ❤️ by <a href="https://pixlnex.vercel.app" target="_blank">Pixlnex</a></p>
+                <nav class="footer-nav" aria-label="Footer">
+                    <a href="index.html">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#academics">Academics</a>
+                    <a href="#administration">Administration</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Eman Educational Complex. All rights reserved.</span>
+                <span>Arifwala, Punjab</span>
             </div>
         </div>
     </footer>
 
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ============ SCRIPTS ============ -->
     <script>
-        // Loading screen
+        // Loading screen (preserved behavior)
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 document.getElementById('loading').classList.add('hidden');
             }, 600);
         });
 
-        // Mobile nav toggle
-        document.querySelector('.nav-toggle').addEventListener('click', function() {
-            this.classList.toggle('active');
-            document.querySelector('.nav-menu').classList.toggle('open');
-            const expanded = this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true';
-            this.setAttribute('aria-expanded', expanded);
+        // Header shrink on scroll (new UI behavior)
+        var header = document.getElementById('siteHeader');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 12) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }, { passive: true });
+
+        // Mobile drawer
+        var navToggle = document.getElementById('navToggle');
+        var drawer = document.getElementById('drawer');
+        var overlay = document.getElementById('drawerOverlay');
+        var drawerClose = document.getElementById('drawerClose');
+
+        function openDrawer() {
+            drawer.classList.add('open');
+            overlay.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            navToggle.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            overlay.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            navToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+        navToggle.addEventListener('click', openDrawer);
+        drawerClose.addEventListener('click', closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+        drawer.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', closeDrawer);
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
         });
 
-        // Close mobile nav on link click
-        document.querySelectorAll('.nav-menu a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                document.querySelector('.nav-toggle').classList.remove('active');
-                document.querySelector('.nav-menu').classList.remove('open');
-                document.querySelector('.nav-toggle').setAttribute('aria-expanded', 'false');
-            });
-        });
-
-        // Smooth scroll for anchor links
+        // Smooth scroll (preserved behavior)
         document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
             anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const target = document.querySelector(targetId);
+                var id = this.getAttribute('href');
+                if (id === '#') return;
+                var target = document.querySelector(id);
                 if (target) {
                     e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth' });
+                    var offset = header.offsetHeight + 8;
+                    var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: top, behavior: 'smooth' });
                 }
             });
         });
