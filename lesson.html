@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson · Eman Educational Complex</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="lessons.css" />
+<style>
+  .video-frame {
+    position: relative; width: 100%; padding-bottom: 56.25%;
+    background: #000; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 20px 60px -20px rgba(23, 75, 58, 0.25);
+  }
+  .video-frame iframe, .video-frame video {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+  }
+  .video-frame.error {
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7); font-size: 0.9rem;
+  }
+
+  .attachment-card {
+    display: flex; align-items: center; gap: 14px; padding: 16px;
+    background: var(--color-white); border: 1px solid rgba(23, 75, 58, 0.1);
+    border-radius: 8px; margin-top: 16px;
+  }
+  .attachment-icon {
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    background: rgba(169, 205, 160, 0.25); border-radius: 6px;
+    color: var(--color-dark-green); font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .attachment-body { flex: 1; min-width: 0; }
+  .attachment-title {
+    font-weight: 600; color: var(--color-dark-green); font-size: 0.95rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .attachment-sub { font-size: 0.82rem; color: rgba(38, 51, 45, 0.55); }
+
+  /* ---- Test invitation card ---- */
+  .test-invite {
+    margin-top: 32px; padding: 32px;
+    background: var(--color-white);
+    border: 2px solid var(--color-dark-green);
+    border-radius: 8px;
+  }
+  .test-invite-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .test-invite h3 {
+    font-family: var(--font-display); font-size: 1.35rem;
+    color: var(--color-dark-green); margin-bottom: 4px;
+  }
+  .test-invite-sub {
+    font-size: 0.9rem; color: rgba(38, 51, 45, 0.65);
+  }
+  .test-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .test-badge.pending  { background: rgba(198, 164, 92, 0.2); color: #8a6d2b; }
+  .test-badge.done     { background: rgba(169, 205, 160, 0.4); color: var(--color-dark-green); }
+  .test-badge.progress { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+
+  .instructions-box {
+    background: rgba(198, 164, 92, 0.1);
+    border-left: 3px solid var(--color-gold);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+  }
+  .instructions-box h4 {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: #8a6d2b; margin-bottom: 12px;
+  }
+  .instructions-box ol {
+    margin: 0; padding-left: 20px;
+    font-size: 0.92rem; color: rgba(38, 51, 45, 0.85); line-height: 1.75;
+  }
+  .instructions-box ol li { margin-bottom: 6px; }
+  .instructions-box ol li:last-child { margin-bottom: 0; }
+  .instructions-box strong { color: var(--color-dark-green); }
+
+  .state-box {
+    padding: 64px 24px; text-align: center;
+    color: rgba(38, 51, 45, 0.55); font-size: 0.95rem;
+  }
+  .state-box a { color: var(--color-dark-green); font-weight: 500; text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .test-invite { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="daily-lessons.html" class="header-brand">
+        <img src="logo.png" alt="Eman Educational Complex" onerror="this.style.display='none';" />
+        <span class="brand-name">Eman Educational Complex<small>Lesson</small></span>
+      </a>
+      <nav class="header-nav">
+        <a href="daily-lessons.html">← All Lessons</a>
+        <button class="btn-signout" onclick="signOut()">Sign Out</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container" id="mainContainer">
+    <div class="state-box">Loading lesson…</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <span>&copy; 2026 Eman Educational Complex</span>
+      <span>Made by <a href="https://pixlnex.vercel.app" target="_blank" rel="noopener">Pixlnex</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const lessonId = new URLSearchParams(location.search).get('id');
+
+let currentUser = null;
+let currentProfile = null;
+let currentTest = null;
+let existingAttempt = null;
+
+(async () => {
+  const auth = await requireAuth();
+  if (!auth) return;
+  currentUser = auth.session.user;
+  currentProfile = auth.profile;
+
+  if (!lessonId) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="state-box">No lesson specified. <a href="daily-lessons.html">Go back →</a></div>';
+    return;
+  }
+
+  const { data: lesson, error } = await db
+    .from('lessons').select('*').eq('id', lessonId).single();
+
+  if (error || !lesson) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="state-box">Lesson not found. <a href="daily-lessons.html">Go back →</a></div>';
+    return;
+  }
+
+  await renderLesson(lesson);
+
+  const { data: tests } = await db
+    .from('tests').select('*').eq('lesson_id', lessonId).limit(1);
+
+  if (!tests || !tests.length) return;
+  currentTest = tests[0];
+
+  const { data: attempt } = await db
+    .from('test_attempts').select('id, submitted_at, score, total_possible, tab_switches')
+    .eq('test_id', currentTest.id).eq('student_id', currentUser.id)
+    .maybeSingle();
+
+  existingAttempt = attempt;
+  renderTestInvite();
+})();
+
+async function renderLesson(lesson) {
+  const videoHtml = await getVideoEmbed(lesson);
+
+  const attachHtml = lesson.attachment_url
+    ? `<div class="attachment-card">
+         <div class="attachment-icon">PDF</div>
+         <div class="attachment-body">
+           <div class="attachment-title">${escapeHtml(lesson.attachment_name || 'Attachment')}</div>
+           <div class="attachment-sub">Study material</div>
+         </div>
+         <a href="${lesson.attachment_url}" target="_blank" rel="noopener"
+            class="btn btn-outline" style="padding:8px 16px;font-size:0.82rem;flex-shrink:0;">Download</a>
+       </div>`
+    : '';
+
+  const date = new Date(lesson.created_at).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  document.getElementById('mainContainer').innerHTML = `
+    <div style="max-width:900px;margin:0 auto;">
+      <div style="margin-bottom:24px;">
+        <span class="card-badge" style="margin-bottom:12px;">${escapeHtml(lesson.class_name)} · ${escapeHtml(lesson.subject)}</span>
+        <h1 style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:8px 0 12px;color:var(--color-dark-green);font-family:var(--font-display);font-weight:400;line-height:1.15;">
+          ${escapeHtml(lesson.title)}
+        </h1>
+        <p style="color:rgba(38,51,45,0.75);line-height:1.7;margin-bottom:12px;">${escapeHtml(lesson.description || '')}</p>
+        <div style="font-size:0.85rem;color:rgba(38,51,45,0.5);">${date}</div>
+      </div>
+      ${videoHtml}
+      ${attachHtml}
+      <div id="testSection"></div>
+    </div>
+  `;
+}
+
+async function getVideoEmbed(lesson) {
+  if (lesson.video_type === 'upload' && lesson.video_storage_path) {
+    const { data, error } = await db.storage
+      .from('lesson-videos').createSignedUrl(lesson.video_storage_path, 3600);
+    if (error || !data) {
+      return '<div class="video-frame error">Could not load video. Please contact your teacher.</div>';
+    }
+    return `
+      <div class="video-frame">
+        <video controls controlsList="nodownload noplaybackrate" oncontextmenu="return false;"
+               preload="metadata" playsinline>
+          <source src="${data.signedUrl}" type="video/mp4">
+        </video>
+      </div>
+    `;
+  }
+  const videoId = getYoutubeId(lesson.video_url);
+  if (!videoId) return '<div class="video-frame error">Invalid video URL</div>';
+  return `
+    <div class="video-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/${videoId}"
+              title="${escapeHtml(lesson.title)}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+    </div>
+  `;
+}
+
+function renderTestInvite() {
+  const section = document.getElementById('testSection');
+  if (!section || !currentTest) return;
+
+  const pass = currentTest.passing_score;
+  const time = currentTest.time_limit_minutes;
+
+  // Determine status
+  let statusBadge = '';
+  let actionBtn = '';
+  let instructionsHtml = '';
+
+  if (existingAttempt && existingAttempt.submitted_at) {
+    // Already submitted
+    const pct = existingAttempt.total_possible > 0
+      ? Math.round((existingAttempt.score / existingAttempt.total_possible) * 100) : 0;
+    const passed = pass != null ? pct >= pass : null;
+    const passText = passed === true ? '✅ Passed' : passed === false ? '❌ Below passing' : '';
+
+    statusBadge = `<span class="test-badge done">Completed</span>`;
+    instructionsHtml = `
+      <div style="padding:18px 20px;background:rgba(169,205,160,0.15);border-radius:6px;margin-bottom:22px;">
+        <div style="font-size:0.82rem;color:rgba(38,51,45,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;">Your Score</div>
+        <div style="font-family:var(--font-display);font-size:2rem;color:var(--color-dark-green);line-height:1;">
+          ${existingAttempt.score}/${existingAttempt.total_possible}
+          <span style="font-size:1.1rem;opacity:0.7;">· ${pct}%</span>
+        </div>
+        ${passText ? `<div style="margin-top:8px;font-size:0.9rem;font-weight:600;color:${passed ? 'var(--color-dark-green)' : '#b91c1c'};">${passText}</div>` : ''}
+      </div>
+    `;
+    actionBtn = `<a href="test.html?attempt=${existingAttempt.id}" class="btn btn-primary">View Full Results</a>`;
+  } else if (existingAttempt) {
+    // In progress (unsubmitted)
+    statusBadge = `<span class="test-badge progress">In Progress</span>`;
+    instructionsHtml = `
+      <div class="instructions-box">
+        <h4>Resume Test</h4>
+        <p style="font-size:0.92rem;color:rgba(38,51,45,0.85);line-height:1.7;margin:0;">
+          You have an unfinished attempt. Click Resume to continue — <strong>the timer is still counting from when you started.</strong>
+        </p>
+      </div>
+    `;
+    actionBtn = `<button class="btn btn-primary" onclick="goToTest()">Resume Test</button>`;
+  } else {
+    // No attempt yet — show instructions and start button
+    statusBadge = `<span class="test-badge pending">Not Started</span>`;
+    instructionsHtml = `
+      <div class="instructions-box">
+        <h4>Important Instructions</h4>
+        <ol>
+          <li><strong>Only one attempt is allowed.</strong> Once you start, you cannot restart.</li>
+          <li><strong>Switching tabs will submit your test immediately</strong> — the first time you leave this page during the test, your answers will be auto-submitted.</li>
+          <li>The timer starts as soon as you click Start Test and continues even if you close the page.</li>
+          <li>Complete the test in one sitting. Do not leave the test page.</li>
+        </ol>
+      </div>
+    `;
+    actionBtn = `<button class="btn btn-primary" id="startTestBtn" onclick="goToTest()">Start Test</button>`;
+  }
+
+  section.innerHTML = `
+    <div class="test-invite">
+      <div class="test-invite-head">
+        <div>
+          <h3>${escapeHtml(currentTest.title)}</h3>
+          <div class="test-invite-sub">
+            ${time ? `⏱ ${time} min · ` : ''}${pass ? `🎯 ${pass}% to pass · ` : ''}Single attempt
+          </div>
+        </div>
+        ${statusBadge}
+      </div>
+      ${instructionsHtml}
+      ${actionBtn}
+    </div>
+  `;
+}
+
+async function goToTest() {
+  const btn = document.getElementById('startTestBtn');
+  if (btn) btn.disabled = true;
+
+  try {
+    // If an attempt already exists, just navigate to it
+    const { data: existing } = await db
+      .from('test_attempts').select('id')
+      .eq('test_id', currentTest.id).eq('student_id', currentUser.id)
+      .maybeSingle();
+
+    if (existing) {
+      window.location.href = `test.html?attempt=${existing.id}`;
+      return;
+    }
+
+    // Load & shuffle questions, then create attempt with question_order
+    const { data: qs, error: qErr } = await db
+      .from('questions').select('id').eq('test_id', currentTest.id);
+
+    if (qErr) throw qErr;
+    if (!qs || !qs.length) throw new Error('This test has no questions yet. Please contact your teacher.');
+
+    const order = shuffle(qs).map(q => q.id);
+
+    const { data: attempt, error } = await db.from('test_attempts').insert({
+      test_id: currentTest.id,
+      student_id: currentUser.id,
+      tab_switches: 0,
+      question_order: order
+    }).select().single();
+
+    if (error) {
+      // Handle unique violation — race condition, another attempt was just created
+      if (error.code === '23505') {
+        const { data: retry } = await db
+          .from('test_attempts').select('id')
+          .eq('test_id', currentTest.id).eq('student_id', currentUser.id)
+          .maybeSingle();
+        if (retry) {
+          window.location.href = `test.html?attempt=${retry.id}`;
+          return;
+        }
+      }
+      throw error;
+    }
+
+    window.location.href = `test.html?attempt=${attempt.id}`;
+  } catch (err) {
+    toast(err.message, 'error');
+    if (btn) btn.disabled = false;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+</script>
+</body>
+</html>

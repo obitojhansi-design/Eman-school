@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Eman Educational Complex</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="lessons.css" />
+<style>
+  /* ---- Tabs ---- */
+  .admin-tabs {
+    display: flex; gap: 4px; margin-bottom: 32px;
+    border-bottom: 2px solid rgba(23, 75, 58, 0.1);
+    overflow-x: auto;
+  }
+  .admin-tab {
+    padding: 12px 20px; font-size: 0.9rem; font-weight: 500;
+    background: none; border: none; color: rgba(38, 51, 45, 0.6);
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    cursor: pointer; transition: all var(--transition); white-space: nowrap;
+  }
+  .admin-tab:hover { color: var(--color-dark-green); }
+  .admin-tab.active { color: var(--color-dark-green); border-bottom-color: var(--color-dark-green); font-weight: 600; }
+  .admin-panel { display: none; }
+  .admin-panel.active { display: block; }
+
+  /* ---- Modal ---- */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(38, 51, 45, 0.55);
+    backdrop-filter: blur(4px); display: none; align-items: flex-start; justify-content: center;
+    z-index: 1000; padding: 20px; overflow-y: auto;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--color-ivory); border-radius: 8px; max-width: 760px; width: 100%;
+    max-height: calc(100vh - 40px); overflow-y: auto; margin: auto;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  }
+  .modal-header {
+    padding: 20px 24px; border-bottom: 1px solid rgba(23, 75, 58, 0.1);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; background: var(--color-ivory); z-index: 2;
+  }
+  .modal-header h2 { font-size: 1.35rem; }
+  .modal-close {
+    background: none; border: none; font-size: 1.6rem; cursor: pointer;
+    color: rgba(38, 51, 45, 0.6); padding: 0 8px; line-height: 1;
+  }
+  .modal-close:hover { color: var(--color-dark-green); }
+  .modal-body { padding: 24px; }
+  .modal-footer {
+    padding: 16px 24px; border-top: 1px solid rgba(23, 75, 58, 0.1);
+    display: flex; gap: 12px; justify-content: flex-end;
+    position: sticky; bottom: 0; background: var(--color-ivory);
+    box-shadow: 0 -4px 16px rgba(23, 75, 58, 0.06);
+  }
+
+  /* ---- Video source radios ---- */
+  .radio-group { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .radio-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    border: 1.5px solid rgba(23, 75, 58, 0.2);
+    border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; font-weight: 500; color: var(--color-dark-green);
+    transition: all var(--transition); background: var(--color-white);
+  }
+  .radio-chip:hover { border-color: rgba(23, 75, 58, 0.4); }
+  .radio-chip input { accent-color: var(--color-dark-green); }
+  .radio-chip:has(input:checked) {
+    border-color: var(--color-dark-green);
+    background: rgba(169, 205, 160, 0.15);
+    font-weight: 600;
+  }
+
+  /* ---- Upload progress ---- */
+  .upload-progress {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--color-white);
+    border-radius: 6px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+  }
+  .progress-track {
+    height: 8px;
+    background: rgba(23, 75, 58, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--color-dark-green);
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+  .progress-label {
+    font-size: 0.8rem;
+    color: rgba(38, 51, 45, 0.65);
+    display: flex; justify-content: space-between;
+  }
+
+  /* ---- Section divider ---- */
+  .section-divider {
+    margin: 24px 0;
+    border: none;
+    border-top: 1px solid rgba(23, 75, 58, 0.1);
+  }
+
+  /* ---- Test builder ---- */
+  .test-settings {
+    background: var(--color-white);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+    margin-bottom: 20px;
+  }
+  .test-settings h4 {
+    font-size: 0.95rem;
+    color: var(--color-dark-green);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .test-settings h4::before {
+    content: ''; width: 3px; height: 14px;
+    background: var(--color-gold); border-radius: 2px;
+  }
+
+  .q-add-bar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 14px 16px;
+    background: rgba(169, 205, 160, 0.1);
+    border-radius: 8px;
+    border: 1px dashed rgba(23, 75, 58, 0.25);
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  .q-summary {
+    font-size: 0.85rem;
+    color: rgba(38, 51, 45, 0.65);
+  }
+  .q-summary strong { color: var(--color-dark-green); }
+
+  .q-card {
+    border: 1px solid rgba(23, 75, 58, 0.15);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: var(--color-white);
+    overflow: hidden;
+  }
+  .q-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(169, 205, 160, 0.08);
+    border-bottom: 1px solid rgba(23, 75, 58, 0.08);
+  }
+  .q-card-title { display: flex; align-items: center; gap: 10px; }
+  .q-num {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--color-dark-green);
+  }
+  .q-type-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--color-dark-green);
+    color: var(--color-ivory);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .q-card-actions { display: flex; gap: 4px; }
+  .q-card-actions button {
+    width: 28px; height: 28px;
+    border: 1px solid rgba(23, 75, 58, 0.2);
+    background: var(--color-white);
+    border-radius: 4px;
+    color: var(--color-dark-green);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .q-card-actions button:hover:not(:disabled) {
+    background: var(--color-dark-green);
+    color: var(--color-ivory);
+  }
+  .q-card-actions button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .q-card-actions .q-remove { border-color: rgba(185, 28, 28, 0.3); color: #b91c1c; }
+  .q-card-actions .q-remove:hover { background: #b91c1c; color: white; border-color: #b91c1c; }
+  .q-card-body { padding: 16px; }
+
+  .option-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .option-row input[type="radio"] { accent-color: var(--color-dark-green); flex-shrink: 0; }
+  .opt-label {
+    font-weight: 700;
+    color: var(--color-dark-green);
+    font-size: 0.85rem;
+    min-width: 18px;
+  }
+  .option-row input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: 1.5px solid rgba(23, 75, 58, 0.2);
+    border-radius: 4px;
+    background: var(--color-white);
+    font-family: var(--font-body);
+  }
+  .option-row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-dark-green);
+  }
+
+  .q-points-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(23, 75, 58, 0.1);
+  }
+  .q-points-row label {
+    font-size: 0.8rem;
+    color: rgba(38, 51, 45, 0.6);
+    font-weight: 500;
+  }
+  .q-points-row input {
+    width: 70px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border: 1.5px solid rgba(23, 75, 58, 0.2);
+    border-radius: 4px;
+    background: var(--color-white);
+  }
+
+  .tf-options { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tf-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 22px;
+    border: 1.5px solid rgba(23, 75, 58, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: all var(--transition);
+    background: var(--color-white);
+  }
+  .tf-option input { accent-color: var(--color-dark-green); }
+  .tf-option:has(input:checked) {
+    border-color: var(--color-dark-green);
+    background: rgba(169, 205, 160, 0.15);
+  }
+
+  /* ---- Preview modal ---- */
+  .preview-q {
+    padding: 20px;
+    background: var(--color-white);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+  }
+  .preview-q .pq-num {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .preview-q .pq-text {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-dark-green);
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .preview-q .pq-option {
+    padding: 10px 14px;
+    border: 1px solid rgba(23, 75, 58, 0.12);
+    border-radius: 5px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: rgba(38, 51, 45, 0.75);
+  }
+  .preview-q .pq-option.correct {
+    background: rgba(169, 205, 160, 0.2);
+    border-color: var(--color-dark-green);
+    font-weight: 600;
+    color: var(--color-dark-green);
+  }
+  .preview-q .pq-input {
+    padding: 10px 14px;
+    border: 1px dashed rgba(23, 75, 58, 0.3);
+    border-radius: 5px;
+    font-size: 0.88rem;
+    color: rgba(38, 51, 45, 0.5);
+    background: rgba(23, 75, 58, 0.02);
+  }
+
+  /* ---- Tables & stats ---- */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--color-white); padding: 20px; border-radius: 8px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+  }
+  .stat-num { font-family: var(--font-display); font-size: 2.2rem; color: var(--color-dark-green); line-height: 1; }
+  .stat-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(38, 51, 45, 0.6); margin-top: 8px; }
+
+  .table-wrap { background: var(--color-white); border-radius: 8px; border: 1px solid rgba(23, 75, 58, 0.1); overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .data-table th {
+    text-align: left; padding: 12px 16px; background: rgba(169, 205, 160, 0.15);
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-dark-green); white-space: nowrap;
+  }
+  .data-table td { padding: 12px 16px; border-top: 1px solid rgba(23, 75, 58, 0.08); }
+  .data-table tr:hover td { background: rgba(169, 205, 160, 0.05); }
+
+  .csv-textarea {
+    width: 100%; min-height: 180px; padding: 12px;
+    font-family: monospace; font-size: 0.82rem;
+    border: 1.5px solid rgba(23, 75, 58, 0.2); border-radius: 4px;
+    background: var(--color-white);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="admin.html" class="header-brand">
+        <img src="logo.png" alt="Eman Educational Complex" onerror="this.style.display='none';" />
+        <span class="brand-name">Eman Educational Complex<small>Admin Panel</small></span>
+      </a>
+      <nav class="header-nav">
+        <span id="adminName" style="font-size:0.85rem; color:var(--color-dark-text);"></span>
+        <a href="daily-lessons.html" style="font-size:0.82rem;">View Student View</a>
+        <button class="btn-signout" onclick="signOut()">Sign Out</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <h1 style="font-size:clamp(1.8rem,3.5vw,2.4rem);margin-bottom:8px;">Admin Dashboard</h1>
+    <p style="color:rgba(38,51,45,0.7);margin-bottom:32px;">Manage lessons, tests, students, and view results.</p>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="lessons">Lessons</button>
+      <button class="admin-tab" data-tab="students">Students</button>
+      <button class="admin-tab" data-tab="results">Results</button>
+    </div>
+
+    <div class="admin-panel active" id="panel-lessons">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="openLessonModal()">+ New Lesson</button>
+      </div>
+      <div id="lessonsList"><div style="text-align:center;padding:40px;color:rgba(38,51,45,0.5);">Loading…</div></div>
+    </div>
+
+    <div class="admin-panel" id="panel-students">
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;">
+        <button class="btn btn-outline" onclick="openCSVModal()">Bulk Upload CSV</button>
+      </div>
+      <div id="studentsList"></div>
+    </div>
+
+    <div class="admin-panel" id="panel-results">
+      <div id="resultsList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON MODAL ============ -->
+<div class="modal-backdrop" id="lessonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="lessonModalTitle">New Lesson</h2>
+      <button class="modal-close" onclick="closeModal('lessonModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="lessonForm" onsubmit="event.preventDefault();">
+        <input type="hidden" id="lessonId" />
+
+        <!-- Lesson metadata -->
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="lessonTitle" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="lessonDescription" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Class *</label>
+            <select id="lessonClass" required>
+              <option value="9th">9th</option>
+              <option value="10th">10th</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <input type="text" id="lessonSubject" value="Quran Tafsir" required />
+          </div>
+        </div>
+
+        <!-- Video source -->
+        <div class="form-group">
+          <label>Video Source *</label>
+          <div class="radio-group">
+            <label class="radio-chip">
+              <input type="radio" name="videoSource" value="youtube" checked onchange="toggleVideoSource()" />
+              YouTube URL
+            </label>
+            <label class="radio-chip">
+              <input type="radio" name="videoSource" value="upload" onchange="toggleVideoSource()" />
+              Upload Video File
+            </label>
+          </div>
+        </div>
+
+        <div id="youtubeField" class="form-group">
+          <label>YouTube Video URL *</label>
+          <input type="url" id="lessonVideo" placeholder="https://www.youtube.com/watch?v=…" />
+          <small>Paste any YouTube URL — video ID extracted automatically.</small>
+        </div>
+
+        <div id="uploadField" class="hidden">
+          <div class="form-group">
+            <label>Video File *</label>
+            <input type="file" id="lessonVideoFile" accept="video/mp4,video/webm,video/quicktime" onchange="validateVideoFile()" />
+            <small id="videoFileInfo">MP4 recommended. Max 500 MB on Pro plan (50 MB on Free).</small>
+          </div>
+          <div class="upload-progress hidden" id="uploadProgressBox">
+            <div class="progress-track">
+              <div class="progress-fill" id="uploadProgressBar"></div>
+            </div>
+            <div class="progress-label">
+              <span id="uploadStatusText">Uploading…</span>
+              <span id="uploadPercent">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PDF attachment -->
+        <div class="form-group">
+          <label>PDF Attachment (optional)</label>
+          <input type="file" id="lessonAttachment" accept="application/pdf" />
+          <small id="attachmentStatus"></small>
+        </div>
+
+        <!-- Test toggle -->
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem;">
+            <input type="checkbox" id="lessonHasTest" onchange="toggleTestFields()" style="accent-color:var(--color-dark-green);" />
+            This lesson has a test
+          </label>
+        </div>
+
+        <!-- Test builder -->
+        <div id="testFields" class="hidden">
+          <hr class="section-divider" />
+          <h3 style="font-size:1.1rem;margin-bottom:16px;">Test Configuration</h3>
+
+          <div class="test-settings">
+            <h4>Settings</h4>
+            <div class="form-group">
+              <label>Test Title *</label>
+              <input type="text" id="testTitle" placeholder="e.g. Tafsir — Lesson 1 Test" />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <input type="text" id="testDescription" placeholder="Optional short description" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Time limit (minutes)</label>
+                <input type="number" id="testTimeLimit" min="1" placeholder="Empty = no limit" />
+              </div>
+              <div class="form-group">
+                <label>Passing score (%)</label>
+                <input type="number" id="testPassingScore" min="0" max="100" placeholder="e.g. 50" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;font-size:0.9rem;color:var(--color-dark-text);">
+                <input type="checkbox" id="testShowAnswers" checked style="accent-color:var(--color-dark-green);" />
+                Show correct answers to students after submission
+              </label>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h4 style="font-size:0.95rem;color:var(--color-dark-green);">Questions</h4>
+            <button type="button" class="btn btn-outline" style="padding:6px 14px;font-size:0.8rem;" onclick="openPreview()">
+              👁 Preview
+            </button>
+          </div>
+
+          <div id="questionsList"></div>
+
+          <div class="q-add-bar">
+            <div class="q-summary">
+              <strong id="qCount">0</strong> question(s) · <strong id="qTotalPoints">0</strong> total points
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:0.8rem;" onclick="addQ('mcq')">+ MCQ</button>
+              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:0.8rem;" onclick="addQ('truefalse')">+ True/False</button>
+              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:0.8rem;" onclick="addQ('short')">+ Short</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('lessonModal')">Cancel</button>
+      <button class="btn btn-primary" id="saveLessonBtn" onclick="saveLesson()">Save Lesson</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PREVIEW MODAL ============ -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Preview — as students will see it</h2>
+      <button class="modal-close" onclick="closeModal('previewModal')">×</button>
+    </div>
+    <div class="modal-body" id="previewBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('previewModal')">Close Preview</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CSV MODAL ============ -->
+<div class="modal-backdrop" id="csvModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Bulk Upload Students</h2>
+      <button class="modal-close" onclick="closeModal('csvModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.9rem;margin-bottom:12px;">
+        Paste CSV with header row:<br>
+        <code style="background:rgba(23,75,58,0.08);padding:2px 6px;border-radius:3px;font-size:0.8rem;">
+          email,password,full_name,roll_number,class_name
+        </code>
+      </p>
+      <textarea class="csv-textarea" id="csvInput" placeholder="email,password,full_name,roll_number,class_name
+ali@example.com,Pass1234,Ali Khan,1001,10th"></textarea>
+      <div id="csvResults" style="margin-top:16px;font-size:0.85rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('csvModal')">Cancel</button>
+      <button class="btn btn-primary" id="uploadCSVBtn" onclick="uploadCSV()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <span>&copy; 2026 Eman Educational Complex</span>
+      <span>Made by <a href="https://pixlnex.vercel.app" target="_blank" rel="noopener">Pixlnex</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+let currentProfile = null;
+let allLessons = [];
+let allTests = [];
+let existingSubmissionsCount = 0;
+
+// Test builder state
+let testQuestions = [];
+let questionKeyCounter = 0;
+
+// Results state
+let allAttempts = [];
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+(async () => {
+  const auth = await requireAuth('admin_or_teacher');
+  if (!auth) return;
+  currentProfile = auth.profile;
+  document.getElementById('adminName').textContent = `${currentProfile.full_name} (${currentProfile.role})`;
+
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      if (tab.dataset.tab === 'students') loadStudents();
+      if (tab.dataset.tab === 'results') loadResults();
+    });
+  });
+
+  await loadLessons();
+})();
+
+/* ============================================================
+   LESSONS LIST
+   ============================================================ */
+async function loadLessons() {
+  const { data: lessons } = await db.from('lessons').select('*').order('created_at', { ascending: false });
+  allLessons = lessons || [];
+
+  const { data: tests } = await db.from('tests').select('*');
+  allTests = tests || [];
+
+  const list = document.getElementById('lessonsList');
+  if (!allLessons.length) {
+    list.innerHTML = '<div class="empty-state">No lessons yet. Click "+ New Lesson" to create one.</div>';
+    return;
+  }
+
+  list.innerHTML = `<div class="card-grid">${allLessons.map(l => {
+    const test = allTests.find(t => t.lesson_id === l.id);
+    const date = new Date(l.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const videoBadge = l.video_type === 'upload' ? '📁 Uploaded' : '▶️ YouTube';
+    return `
+      <div class="card">
+        <span class="card-badge">${escapeHtml(l.class_name)} · ${escapeHtml(l.subject)}</span>
+        <h3 class="card-title">${escapeHtml(l.title)}</h3>
+        <p class="card-desc">${escapeHtml(l.description || '')}</p>
+        <div class="card-meta">${date} · ${videoBadge} ${test ? '· Has test' : '· No test'}</div>
+        <div class="card-actions">
+          <button class="btn btn-outline" style="padding:8px 14px;font-size:0.82rem;" onclick="editLesson('${l.id}')">Edit</button>
+          <button class="btn btn-danger" style="padding:8px 14px;font-size:0.82rem;" onclick="deleteLesson('${l.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+
+/* ============================================================
+   STUDENTS
+   ============================================================ */
+async function loadStudents() {
+  const { data: students } = await db.from('profiles').select('*').eq('role', 'student').order('full_name');
+  const list = document.getElementById('studentsList');
+  if (!students || !students.length) {
+    list.innerHTML = '<div class="empty-state">No students yet. Use "Bulk Upload CSV".</div>';
+    return;
+  }
+  list.innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Roll No.</th><th>Class</th></tr></thead>
+        <tbody>
+          ${students.map(s => `
+            <tr>
+              <td><strong>${escapeHtml(s.full_name)}</strong></td>
+              <td>${escapeHtml(s.email || '—')}</td>
+              <td>${escapeHtml(s.roll_number || '—')}</td>
+              <td>${escapeHtml(s.class_name || '—')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ============================================================
+   RESULTS — flat table with filter
+   ============================================================ */
+async function loadResults() {
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(38,51,45,0.5);">Loading results…</div>';
+
+  const { data: attempts, error } = await db
+    .from('test_attempts')
+    .select('*, profiles(full_name, roll_number, class_name), tests(title, passing_score)')
+    .not('submitted_at', 'is', null)
+    .order('submitted_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = `<div class="empty-state">Error loading results: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+  allAttempts = attempts || [];
+
+  if (!allAttempts.length) {
+    list.innerHTML = '<div class="empty-state">No submitted test attempts yet.</div>';
+    return;
+  }
+
+  // Unique test list for filter dropdown
+  const uniqueTests = new Map();
+  allAttempts.forEach(a => {
+    if (a.tests?.title) uniqueTests.set(a.test_id, a.tests.title);
+  });
+
+  list.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:0.85rem;font-weight:500;color:rgba(38,51,45,0.7);">Filter by test:</label>
+        <select id="resultsFilter" onchange="renderResultsTable()"
+                style="padding:8px 14px;font-size:0.9rem;border:1.5px solid rgba(23,75,58,0.2);border-radius:4px;background:var(--color-white);font-family:var(--font-body);">
+          <option value="all">All Tests (${allAttempts.length})</option>
+          ${[...uniqueTests.entries()].map(([id, title]) => {
+            const count = allAttempts.filter(a => a.test_id === id).length;
+            return `<option value="${id}">${escapeHtml(title)} (${count})</option>`;
+          }).join('')}
+        </select>
+      </div>
+      <div style="font-size:0.82rem;color:rgba(38,51,45,0.6);" id="resultsSummary"></div>
+    </div>
+    <div id="resultsTableWrap"></div>
+  `;
+
+  renderResultsTable();
+}
+
+function renderResultsTable() {
+  const filter = document.getElementById('resultsFilter')?.value || 'all';
+  const filtered = filter === 'all'
+    ? allAttempts
+    : allAttempts.filter(a => a.test_id === filter);
+
+  const wrap = document.getElementById('resultsTableWrap');
+  const summary = document.getElementById('resultsSummary');
+
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty-state">No results for this test yet.</div>';
+    if (summary) summary.textContent = '';
+    return;
+  }
+
+  // Summary line above table
+  if (summary) {
+    const avg = Math.round(filtered.reduce((s, a) =>
+      s + (a.total_possible > 0 ? (a.score / a.total_possible) * 100 : 0), 0) / filtered.length);
+    const passed = filtered.filter(a => {
+      const p = a.tests?.passing_score;
+      if (p == null) return false;
+      return (a.score / a.total_possible) * 100 >= p;
+    }).length;
+    const cheatCount = filtered.filter(a => (a.cheating_detected || a.tab_switches > 0)).length;
+    summary.textContent = `Average: ${avg}% · Passed: ${passed}/${filtered.length} · Flagged: ${cheatCount}`;
+  }
+
+  wrap.innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Class</th>
+            <th>Roll No.</th>
+            <th>Test</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Pass / Fail</th>
+            <th>Cheating</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(a => {
+            const pct = a.total_possible > 0
+              ? Math.round((a.score / a.total_possible) * 100) : 0;
+            const passing = a.tests?.passing_score;
+            const passLabel = passing == null
+              ? '<span style="color:rgba(38,51,45,0.5);">—</span>'
+              : pct >= passing
+                ? '<span style="color:#059669;font-weight:600;">Pass</span>'
+                : '<span style="color:#b91c1c;font-weight:600;">Fail</span>';
+            const cheated = a.cheating_detected || a.tab_switches > 0;
+            const cheatLabel = cheated
+              ? '<span style="color:#b91c1c;font-weight:600;">Yes</span>'
+              : '<span style="color:rgba(38,51,45,0.55);">No</span>';
+
+            return `
+              <tr>
+                <td><strong>${escapeHtml(a.profiles?.full_name || 'Unknown')}</strong></td>
+                <td>${escapeHtml(a.profiles?.class_name || '—')}</td>
+                <td>${escapeHtml(a.profiles?.roll_number || '—')}</td>
+                <td>${escapeHtml(a.tests?.title || '—')}</td>
+                <td>${a.score} / ${a.total_possible}</td>
+                <td>${pct}%</td>
+                <td>${passLabel}</td>
+                <td>${cheatLabel}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ============================================================
+   LESSON MODAL — open / edit / delete
+   ============================================================ */
+function openLessonModal(lesson = null) {
+  document.getElementById('lessonModalTitle').textContent = lesson ? 'Edit Lesson' : 'New Lesson';
+  document.getElementById('lessonId').value = lesson?.id || '';
+  document.getElementById('lessonTitle').value = lesson?.title || '';
+  document.getElementById('lessonDescription').value = lesson?.description || '';
+  document.getElementById('lessonClass').value = lesson?.class_name || '10th';
+  document.getElementById('lessonSubject').value = lesson?.subject || 'Quran Tafsir';
+  document.getElementById('lessonVideo').value = lesson?.video_url || '';
+  document.getElementById('lessonHasTest').checked = false;
+  document.getElementById('testFields').classList.add('hidden');
+  document.getElementById('questionsList').innerHTML = '';
+  document.getElementById('attachmentStatus').textContent = '';
+  document.getElementById('lessonAttachment').value = '';
+  document.getElementById('lessonVideoFile').value = '';
+  document.getElementById('uploadProgressBox').classList.add('hidden');
+  document.getElementById('videoFileInfo').textContent = 'MP4 recommended. Max 500 MB on Pro plan (50 MB on Free).';
+
+  document.querySelector('input[name="videoSource"][value="youtube"]').checked = true;
+  toggleVideoSource();
+
+  testQuestions = [];
+  renderQuestions();
+
+  document.getElementById('lessonModal').classList.add('show');
+}
+
+async function editLesson(id) {
+  const lesson = allLessons.find(l => l.id === id);
+  if (!lesson) return;
+
+  openLessonModal(lesson);
+
+  if (lesson.video_type === 'upload') {
+    document.querySelector('input[name="videoSource"][value="upload"]').checked = true;
+    toggleVideoSource();
+    document.getElementById('videoFileInfo').textContent =
+      'Current file uploaded. Leave blank to keep existing video, or choose a new file to replace it.';
+  }
+
+  const { data: tests } = await db
+    .from('tests').select('*').eq('lesson_id', id).limit(1);
+
+  if (tests && tests.length) {
+    const test = tests[0];
+    document.getElementById('lessonHasTest').checked = true;
+    document.getElementById('testFields').classList.remove('hidden');
+    document.getElementById('testTitle').value = test.title || '';
+    document.getElementById('testDescription').value = test.description || '';
+    document.getElementById('testTimeLimit').value = test.time_limit_minutes || '';
+    document.getElementById('testPassingScore').value = test.passing_score ?? '';
+    document.getElementById('testShowAnswers').checked = test.show_correct_answers !== false;
+
+    const { data: qs } = await db
+      .from('questions').select('*').eq('test_id', test.id).order('order_index');
+
+    testQuestions = (qs || []).map(q => ({
+      _key: ++questionKeyCounter,
+      id: q.id,
+      type: q.type,
+      text: q.question_text,
+      options: q.type === 'truefalse' ? ['True', 'False'] : (q.options || ['', '', '', '']),
+      correct: q.type === 'short' ? q.correct_answer : q.correct_answer,
+      points: q.points || 1
+    }));
+
+    const { count } = await db
+      .from('test_attempts')
+      .select('id', { count: 'exact', head: true })
+      .eq('test_id', test.id)
+      .not('submitted_at', 'is', null);
+    existingSubmissionsCount = count || 0;
+
+    renderQuestions();
+  }
+}
+
+async function deleteLesson(id) {
+  if (!confirm('Delete this lesson and its test? Cannot be undone.')) return;
+  const lesson = allLessons.find(l => l.id === id);
+
+  if (lesson?.video_storage_path) {
+    await db.storage.from('lesson-videos').remove([lesson.video_storage_path]).catch(() => {});
+  }
+
+  const { error } = await db.from('lessons').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, 'error'); return; }
+  toast('Lesson deleted', 'success');
+  loadLessons();
+}
+
+/* ============================================================
+   VIDEO SOURCE TOGGLE
+   ============================================================ */
+function toggleVideoSource() {
+  const source = document.querySelector('input[name="videoSource"]:checked').value;
+  document.getElementById('youtubeField').classList.toggle('hidden', source !== 'youtube');
+  document.getElementById('uploadField').classList.toggle('hidden', source !== 'upload');
+}
+
+function validateVideoFile() {
+  const file = document.getElementById('lessonVideoFile').files[0];
+  const info = document.getElementById('videoFileInfo');
+  if (!file) { info.textContent = 'MP4 recommended. Max 500 MB on Pro plan (50 MB on Free).'; return; }
+
+  const mb = (file.size / (1024 * 1024)).toFixed(1);
+  if (file.size > 500 * 1024 * 1024) {
+    info.innerHTML = `<span style="color:#b91c1c;font-weight:600;">⚠️ File is ${mb} MB — exceeds 500 MB limit. Compress with Handbrake first.</span>`;
+    document.getElementById('lessonVideoFile').value = '';
+    return;
+  }
+  if (file.size > 50 * 1024 * 1024) {
+    info.innerHTML = `<span style="color:#8a6d2b;font-weight:500;">⚠️ ${mb} MB — exceeds Free tier (50 MB). Requires Pro plan. Upload may fail.</span>`;
+    return;
+  }
+  info.innerHTML = `<span style="color:#059669;">✓ ${mb} MB — ready to upload.</span>`;
+}
+
+/* ============================================================
+   TEST TOGGLE
+   ============================================================ */
+function toggleTestFields() {
+  const checked = document.getElementById('lessonHasTest').checked;
+  document.getElementById('testFields').classList.toggle('hidden', !checked);
+}
+
+/* ============================================================
+   TEST BUILDER
+   ============================================================ */
+function addQ(type) {
+  testQuestions.push({
+    _key: ++questionKeyCounter,
+    id: null,
+    type: type,
+    text: '',
+    options: type === 'mcq' ? ['', '', '', ''] : type === 'truefalse' ? ['True', 'False'] : null,
+    correct: type === 'short' ? '' : 0,
+    points: 1
+  });
+  renderQuestions();
+}
+
+function moveQ(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= testQuestions.length) return;
+  [testQuestions[idx], testQuestions[newIdx]] = [testQuestions[newIdx], testQuestions[idx]];
+  renderQuestions();
+}
+
+function dupQ(idx) {
+  const q = testQuestions[idx];
+  const copy = {
+    _key: ++questionKeyCounter,
+    id: null,
+    type: q.type,
+    text: q.text,
+    options: q.options ? [...q.options] : null,
+    correct: q.correct,
+    points: q.points
+  };
+  testQuestions.splice(idx + 1, 0, copy);
+  renderQuestions();
+}
+
+function removeQ(idx) {
+  testQuestions.splice(idx, 1);
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById('questionsList');
+  const totalPoints = testQuestions.reduce((s, q) => s + (parseInt(q.points) || 0), 0);
+  document.getElementById('qCount').textContent = testQuestions.length;
+  document.getElementById('qTotalPoints').textContent = totalPoints;
+
+  if (!testQuestions.length) {
+    container.innerHTML = '<div style="padding:28px;text-align:center;border:1px dashed rgba(23,75,58,0.2);border-radius:6px;color:rgba(38,51,45,0.5);font-size:0.9rem;">No questions yet. Add one below.</div>';
+    return;
+  }
+
+  container.innerHTML = testQuestions.map((q, i) => renderQCard(q, i)).join('');
+}
+
+function renderQCard(q, i) {
+  const typeLabel = q.type === 'mcq' ? 'MCQ' : q.type === 'truefalse' ? 'True/False' : 'Short';
+  let bodyHtml = '';
+
+  if (q.type === 'mcq') {
+    bodyHtml = `
+      <div class="form-group" style="margin-bottom:14px;">
+        <label style="font-size:0.78rem;">Question text</label>
+        <input type="text" value="${escapeAttr(q.text)}" placeholder="Type the question…"
+               oninput="testQuestions[${i}].text=this.value" style="width:100%;padding:8px 12px;border:1.5px solid rgba(23,75,58,0.2);border-radius:4px;background:var(--color-white);font-family:var(--font-body);" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:0.78rem;">Options (select the correct one)</label>
+        ${q.options.map((opt, oi) => `
+          <div class="option-row">
+            <input type="radio" name="correct_${q._key}" ${String(q.correct) === String(oi) ? 'checked' : ''} onchange="testQuestions[${i}].correct=${oi}" />
+            <span class="opt-label">${String.fromCharCode(65 + oi)}</span>
+            <input type="text" value="${escapeAttr(opt)}" placeholder="Option ${String.fromCharCode(65 + oi)}"
+                   oninput="testQuestions[${i}].options[${oi}]=this.value" />
+          </div>
+        `).join('')}
+      </div>
+      <div class="q-points-row">
+        <label>Points</label>
+        <input type="number" min="1" value="${q.points}" oninput="testQuestions[${i}].points=parseInt(this.value)||1" />
+      </div>
+    `;
+  } else if (q.type === 'truefalse') {
+    bodyHtml = `
+      <div class="form-group" style="margin-bottom:14px;">
+        <label style="font-size:0.78rem;">Statement</label>
+        <input type="text" value="${escapeAttr(q.text)}" placeholder="Type a statement…"
+               oninput="testQuestions[${i}].text=this.value" style="width:100%;padding:8px 12px;border:1.5px solid rgba(23,75,58,0.2);border-radius:4px;background:var(--color-white);font-family:var(--font-body);" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:0.78rem;">Correct answer</label>
+        <div class="tf-options">
+          <label class="tf-option">
+            <input type="radio" name="tf_${q._key}" ${q.correct === 0 ? 'checked' : ''} onchange="testQuestions[${i}].correct=0" />
+            True
+          </label>
+          <label class="tf-option">
+            <input type="radio" name="tf_${q._key}" ${q.correct === 1 ? 'checked' : ''} onchange="testQuestions[${i}].correct=1" />
+            False
+          </label>
+        </div>
+      </div>
+      <div class="q-points-row">
+        <label>Points</label>
+        <input type="number" min="1" value="${q.points}" oninput="testQuestions[${i}].points=parseInt(this.value)||1" />
+      </div>
+    `;
+  } else {
+    bodyHtml = `
+      <div class="form-group" style="margin-bottom:14px;">
+        <label style="font-size:0.78rem;">Question text</label>
+        <input type="text" value="${escapeAttr(q.text)}" placeholder="Type the question…"
+               oninput="testQuestions[${i}].text=this.value" style="width:100%;padding:8px 12px;border:1.5px solid rgba(23,75,58,0.2);border-radius:4px;background:var(--color-white);font-family:var(--font-body);" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:0.78rem;">Correct answer (exact match, case-insensitive)</label>
+        <input type="text" value="${escapeAttr(q.correct)}" placeholder="e.g. Five"
+               oninput="testQuestions[${i}].correct=this.value" style="width:100%;padding:8px 12px;border:1.5px solid rgba(23,75,58,0.2);border-radius:4px;background:var(--color-white);font-family:var(--font-body);" />
+      </div>
+      <div class="q-points-row">
+        <label>Points</label>
+        <input type="number" min="1" value="${q.points}" oninput="testQuestions[${i}].points=parseInt(this.value)||1" />
+      </div>
+    `;
+  }
+
+  return `
+    <div class="q-card">
+      <div class="q-card-header">
+        <div class="q-card-title">
+          <span class="q-num">Q${i + 1}</span>
+          <span class="q-type-badge">${typeLabel}</span>
+        </div>
+        <div class="q-card-actions">
+          <button type="button" onclick="moveQ(${i},-1)" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
+          <button type="button" onclick="moveQ(${i},1)" ${i === testQuestions.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+          <button type="button" onclick="dupQ(${i})" title="Duplicate">⧉</button>
+          <button type="button" class="q-remove" onclick="removeQ(${i})" title="Remove">×</button>
+        </div>
+      </div>
+      <div class="q-card-body">${bodyHtml}</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   TEST PREVIEW
+   ============================================================ */
+function openPreview() {
+  const body = document.getElementById('previewBody');
+  const title = document.getElementById('testTitle').value.trim() || 'Untitled Test';
+  const timeLimit = document.getElementById('testTimeLimit').value;
+  const passScore = document.getElementById('testPassingScore').value;
+
+  if (!testQuestions.length) {
+    body.innerHTML = '<div class="empty-state">No questions to preview yet.</div>';
+    document.getElementById('previewModal').classList.add('show');
+    return;
+  }
+
+  body.innerHTML = `
+    <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(23,75,58,0.1);">
+      <h3 style="font-family:var(--font-display);color:var(--color-dark-green);font-size:1.3rem;margin-bottom:8px;">${escapeHtml(title)}</h3>
+      <div style="font-size:0.82rem;color:rgba(38,51,45,0.6);">
+        ${testQuestions.length} question(s) ·
+        ${testQuestions.reduce((s,q)=>s+(parseInt(q.points)||0),0)} points
+        ${timeLimit ? '· ⏱ ' + timeLimit + ' min' : ''}
+        ${passScore ? '· Pass: ' + passScore + '%' : ''}
+      </div>
+    </div>
+    ${testQuestions.map((q, i) => {
+      let content = '';
+      if (q.type === 'mcq') {
+        content = q.options.map((opt, oi) => `
+          <div class="pq-option ${String(q.correct) === String(oi) ? 'correct' : ''}">
+            ${String.fromCharCode(65 + oi)}. ${escapeHtml(opt || '(empty)')}
+          </div>
+        `).join('');
+      } else if (q.type === 'truefalse') {
+        content = `
+          <div class="pq-option ${q.correct === 0 ? 'correct' : ''}">True</div>
+          <div class="pq-option ${q.correct === 1 ? 'correct' : ''}">False</div>
+        `;
+      } else {
+        content = `<div class="pq-input">Correct answer: ${escapeHtml(q.correct || '(empty)')}</div>`;
+      }
+      return `
+        <div class="preview-q">
+          <div class="pq-num">Question ${i + 1} · ${q.points} pt</div>
+          <div class="pq-text">${escapeHtml(q.text || '(no question text)')}</div>
+          ${content}
+        </div>
+      `;
+    }).join('')}
+    <p style="font-size:0.8rem;color:rgba(38,51,45,0.5);text-align:center;margin-top:20px;">
+      Correct answers are highlighted in green. Students will see these only after submitting (if enabled).
+    </p>
+  `;
+  document.getElementById('previewModal').classList.add('show');
+}
+
+/* ============================================================
+   VALIDATION
+   ============================================================ */
+function validateTest() {
+  const errors = [];
+
+  const title = document.getElementById('testTitle').value.trim();
+  if (!title) errors.push('Test title is required.');
+
+  if (!testQuestions.length) errors.push('Add at least one question.');
+
+  testQuestions.forEach((q, i) => {
+    const n = i + 1;
+    if (!q.text?.trim()) errors.push(`Q${n}: question text is empty.`);
+
+    if (q.type === 'mcq') {
+      if (!q.options?.length) errors.push(`Q${n}: options are missing.`);
+      else {
+        const emptyOpts = q.options.filter(o => !o?.trim());
+        if (emptyOpts.length) errors.push(`Q${n}: all options must have text.`);
+        if (q.correct === undefined || q.correct === null) errors.push(`Q${n}: no correct option selected.`);
+        else if (!q.options[q.correct]?.trim()) errors.push(`Q${n}: correct option has no text.`);
+      }
+    } else if (q.type === 'short') {
+      if (!q.correct?.trim()) errors.push(`Q${n}: correct answer is required.`);
+    } else if (q.type === 'truefalse') {
+      if (q.correct !== 0 && q.correct !== 1) errors.push(`Q${n}: select True or False.`);
+    }
+  });
+
+  return errors;
+}
+
+/* ============================================================
+   SAVE LESSON
+   ============================================================ */
+async function saveLesson() {
+  const btn = document.getElementById('saveLessonBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const title = document.getElementById('lessonTitle').value.trim();
+    const description = document.getElementById('lessonDescription').value.trim();
+    const class_name = document.getElementById('lessonClass').value;
+    const subject = document.getElementById('lessonSubject').value.trim();
+    const videoSource = document.querySelector('input[name="videoSource"]:checked').value;
+    const hasTest = document.getElementById('lessonHasTest').checked;
+    const existingId = document.getElementById('lessonId').value;
+    const existingLesson = allLessons.find(l => l.id === existingId);
+
+    if (!title) throw new Error('Lesson title is required.');
+
+    if (existingId && hasTest && existingSubmissionsCount > 0) {
+      if (!confirm(`${existingSubmissionsCount} student(s) already submitted this test. Editing will replace all questions — their results view may be affected. Continue?`)) {
+        btn.disabled = false;
+        btn.textContent = 'Save Lesson';
+        return;
+      }
+    }
+
+    // ---- Video handling ----
+    let video_type = videoSource;
+    let video_url = null;
+    let video_storage_path = null;
+
+    if (videoSource === 'youtube') {
+      video_url = document.getElementById('lessonVideo').value.trim();
+      if (!video_url) throw new Error('YouTube URL is required.');
+      if (!getYoutubeId(video_url)) throw new Error('Invalid YouTube URL.');
+      video_storage_path = null;
+    } else {
+      const fileInput = document.getElementById('lessonVideoFile');
+      const file = fileInput.files[0];
+
+      if (file) {
+        if (file.size > 500 * 1024 * 1024) throw new Error('File exceeds 500 MB. Compress with Handbrake first.');
+
+        const sanitized = file.name.replace(/[^a-z0-9._-]/gi, '_').toLowerCase();
+        const path = `videos/${Date.now()}-${sanitized}`;
+
+        document.getElementById('uploadProgressBox').classList.remove('hidden');
+        await uploadVideoWithProgress(path, file);
+
+        video_storage_path = path;
+        video_url = null;
+      } else if (existingLesson?.video_storage_path) {
+        video_storage_path = existingLesson.video_storage_path;
+      } else {
+        throw new Error('Please choose a video file to upload.');
+      }
+    }
+
+    // ---- PDF attachment ----
+    let attachment_url = existingLesson?.attachment_url || null;
+    let attachment_name = existingLesson?.attachment_name || null;
+    const pdfInput = document.getElementById('lessonAttachment');
+    if (pdfInput.files.length) {
+      const pdf = pdfInput.files[0];
+      const path = `${Date.now()}-${pdf.name.replace(/[^a-z0-9.]/gi, '_')}`;
+      const { error: upErr } = await db.storage.from('lesson-attachments').upload(path, pdf);
+      if (upErr) throw new Error('PDF upload failed: ' + upErr.message);
+      const { data: signed } = await db.storage.from('lesson-attachments').createSignedUrl(path, 60 * 60 * 24 * 365);
+      attachment_url = signed?.signedUrl || null;
+      attachment_name = pdf.name;
+    }
+
+    // ---- Save lesson ----
+    const lessonData = {
+      title,
+      description,
+      class_name,
+      subject,
+      video_type,
+      video_url,
+      video_storage_path,
+      created_by: currentProfile.id,
+      published: true
+    };
+    if (attachment_url) {
+      lessonData.attachment_url = attachment_url;
+      lessonData.attachment_name = attachment_name;
+    }
+
+    let lessonId = existingId;
+    if (existingId) {
+      const { error } = await db.from('lessons').update(lessonData).eq('id', existingId);
+      if (error) throw error;
+
+      if (existingLesson?.video_storage_path && existingLesson.video_storage_path !== video_storage_path) {
+        await db.storage.from('lesson-videos').remove([existingLesson.video_storage_path]).catch(() => {});
+      }
+    } else {
+      const { data, error } = await db.from('lessons').insert(lessonData).select().single();
+      if (error) throw error;
+      lessonId = data.id;
+    }
+
+    // ---- Test handling ----
+    if (hasTest) {
+      const testErrors = validateTest();
+      if (testErrors.length) {
+        throw new Error(testErrors.slice(0, 3).join(' · ') + (testErrors.length > 3 ? ` (+${testErrors.length - 3} more)` : ''));
+      }
+
+      const testTitle = document.getElementById('testTitle').value.trim();
+      const testDesc = document.getElementById('testDescription').value.trim();
+      const timeLimit = document.getElementById('testTimeLimit').value;
+      const passScore = document.getElementById('testPassingScore').value;
+      const showAnswers = document.getElementById('testShowAnswers').checked;
+
+      await db.from('tests').delete().eq('lesson_id', lessonId);
+
+      const { data: test, error: tErr } = await db.from('tests').insert({
+        lesson_id: lessonId,
+        title: testTitle,
+        description: testDesc || null,
+        time_limit_minutes: timeLimit ? parseInt(timeLimit) : null,
+        passing_score: passScore ? parseInt(passScore) : null,
+        show_correct_answers: showAnswers,
+        created_by: currentProfile.id
+      }).select().single();
+      if (tErr) throw tErr;
+
+      const questionsToInsert = testQuestions.map((q, i) => ({
+        test_id: test.id,
+        type: q.type,
+        question_text: q.text,
+        options: q.type === 'truefalse' ? ['True', 'False'] : (q.type === 'mcq' ? q.options : null),
+        correct_answer: String(q.correct),
+        points: parseInt(q.points) || 1,
+        order_index: i
+      }));
+
+      const { error: qErr } = await db.from('questions').insert(questionsToInsert);
+      if (qErr) throw qErr;
+    } else {
+      await db.from('tests').delete().eq('lesson_id', lessonId);
+    }
+
+    toast('Lesson saved successfully', 'success');
+    closeModal('lessonModal');
+    loadLessons();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Lesson';
+    document.getElementById('uploadProgressBox').classList.add('hidden');
+  }
+}
+
+/* ============================================================
+   UPLOAD with progress — corrected headers
+   ============================================================ */
+async function uploadVideoWithProgress(path, file) {
+  const { data: { session } } = await db.auth.getSession();
+  const token = session.access_token;
+
+  const url = `${SUPABASE_URL}/storage/v1/object/lesson-videos/${path}`;
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+    xhr.setRequestHeader('x-upsert', 'false');
+    xhr.setRequestHeader('cache-control', 'max-age=3600');
+    xhr.setRequestHeader('content-type', file.type || 'application/octet-stream');
+
+    xhr.upload.onprogress = (e) => {
+      if (!e.lengthComputable) return;
+      const pct = Math.round((e.loaded / e.total) * 100);
+      document.getElementById('uploadProgressBar').style.width = pct + '%';
+      document.getElementById('uploadPercent').textContent = pct + '%';
+      const mbLoaded = (e.loaded / (1024 * 1024)).toFixed(1);
+      const mbTotal  = (e.total  / (1024 * 1024)).toFixed(1);
+      document.getElementById('uploadStatusText').textContent = `${mbLoaded} / ${mbTotal} MB`;
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        document.getElementById('uploadStatusText').textContent = 'Upload complete';
+        document.getElementById('uploadProgressBar').style.width = '100%';
+        resolve();
+      } else {
+        let msg = xhr.responseText;
+        try {
+          const parsed = JSON.parse(msg);
+          msg = parsed.message || parsed.error || msg;
+        } catch (_) {}
+        reject(new Error(`Upload failed (${xhr.status}): ${msg}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+
+    xhr.timeout = 10 * 60 * 1000;
+    xhr.ontimeout = () => reject(new Error('Upload timed out — check your connection or try a smaller file'));
+
+    xhr.send(file);
+  });
+}
+
+/* ============================================================
+   CSV UPLOAD
+   ============================================================ */
+function openCSVModal() {
+  document.getElementById('csvResults').innerHTML = '';
+  document.getElementById('csvInput').value = '';
+  document.getElementById('csvModal').classList.add('show');
+}
+
+async function uploadCSV() {
+  const btn = document.getElementById('uploadCSVBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+  const results = document.getElementById('csvResults');
+
+  try {
+    const csv = document.getElementById('csvInput').value.trim();
+    if (!csv) throw new Error('Paste CSV data first');
+
+    const lines = csv.split('\n').filter(l => l.trim());
+    const header = lines[0].toLowerCase().split(',').map(h => h.trim());
+    for (const r of ['email', 'password', 'full_name']) {
+      if (!header.includes(r)) throw new Error(`Missing column: ${r}`);
+    }
+
+    const students = lines.slice(1).map(line => {
+      const vals = line.split(',').map(v => v.trim());
+      const obj = {};
+      header.forEach((k, i) => { obj[k] = vals[i]; });
+      return obj;
+    });
+
+    const { data, error } = await db.functions.invoke('create-students', { body: { students } });
+    if (error) throw error;
+
+    results.innerHTML = (data.results || []).map(r =>
+      `<div style="padding:4px 0;color:${r.success ? '#059669' : '#b91c1c'};">
+        ${r.success ? '✓' : '✕'} ${r.email} ${r.error ? '— ' + r.error : ''}
+      </div>`
+    ).join('');
+
+    if ((data.results || []).every(r => r.success)) toast('All students created', 'success');
+  } catch (err) {
+    results.innerHTML = `<div style="color:#b91c1c;">${escapeHtml(err.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload';
+  }
+}
+
+/* ============================================================
+   MODAL CLOSE
+   ============================================================ */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+</script>
+</body>
+</html>

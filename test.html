@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Test · Eman Educational Complex</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="lessons.css" />
+<style>
+  body { overflow-x: hidden; }
+
+  /* Compact header — no distraction */
+  .test-topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--color-dark-green);
+    color: var(--color-ivory);
+    padding: 12px 20px;
+    box-shadow: 0 4px 16px rgba(23, 75, 58, 0.2);
+  }
+  .test-topbar-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .test-topbar-title {
+    font-size: 0.95rem; font-weight: 600; line-height: 1.3;
+  }
+  .test-topbar-meta {
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    opacity: 0.7; margin-bottom: 2px;
+  }
+  .test-topbar-right {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .test-timer {
+    font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    padding: 6px 14px; background: rgba(255,255,255,0.1); border-radius: 6px;
+    min-width: 84px; text-align: center;
+  }
+  .test-timer.warning { color: #fbbf24; }
+  .test-timer.danger  { color: #f87171; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+
+  .test-shell {
+    max-width: 800px; margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  .test-intro-warning {
+    background: rgba(198, 164, 92, 0.12);
+    border-left: 3px solid var(--color-gold);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: rgba(38, 51, 45, 0.85);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .test-intro-warning strong { color: #8a6d2b; }
+
+  .question-block {
+    background: var(--color-white);
+    border: 1px solid rgba(23, 75, 58, 0.1);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .question-num {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--color-gold); margin-bottom: 10px;
+  }
+  .question-text {
+    font-family: var(--font-display); font-size: 1.15rem;
+    color: var(--color-dark-green); line-height: 1.4; margin-bottom: 18px;
+  }
+  .mcq-options { display: flex; flex-direction: column; gap: 10px; }
+  .mcq-option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px; border: 1.5px solid rgba(23, 75, 58, 0.15);
+    border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
+    background: var(--color-white);
+  }
+  .mcq-option:hover { border-color: rgba(23, 75, 58, 0.4); background: rgba(169, 205, 160, 0.06); }
+  .mcq-option.selected { border-color: var(--color-dark-green); background: rgba(169, 205, 160, 0.2); }
+  .mcq-option input { margin-top: 3px; accent-color: var(--color-dark-green); flex-shrink: 0; }
+  .mcq-option span { font-size: 0.95rem; color: var(--color-dark-text); line-height: 1.5; }
+  .short-input {
+    width: 100%; padding: 12px 16px; font-family: var(--font-body); font-size: 0.95rem;
+    border: 1.5px solid rgba(23, 75, 58, 0.2); border-radius: 6px;
+    background: var(--color-white); color: var(--color-dark-text);
+  }
+  .short-input:focus { outline: none; border-color: var(--color-dark-green); }
+
+  .test-actions {
+    display: flex; justify-content: flex-end; gap: 12px;
+    padding: 24px; background: var(--color-white); border-radius: 8px;
+    border: 1px solid rgba(23, 75, 58, 0.1); flex-wrap: wrap;
+  }
+
+  /* ---- Results ---- */
+  .results-panel {
+    background: var(--color-white); border-radius: 8px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+    padding: 40px;
+    max-width: 720px; margin: 32px auto;
+  }
+  .results-header { text-align: center; margin-bottom: 32px; }
+  .results-label {
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(38, 51, 45, 0.55);
+  }
+  .results-score {
+    font-family: var(--font-display); font-size: 4rem; color: var(--color-dark-green);
+    line-height: 1; margin: 12px 0 6px;
+  }
+  .results-pct { font-size: 1.1rem; color: var(--color-dark-green); opacity: 0.75; }
+  .pass-badge {
+    display: inline-block; padding: 6px 18px; border-radius: 999px;
+    font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 12px;
+  }
+  .pass-badge.pass { background: rgba(169, 205, 160, 0.4); color: var(--color-dark-green); }
+  .pass-badge.fail { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+
+  .result-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 18px 0; border-top: 1px solid rgba(23, 75, 58, 0.08);
+  }
+  .result-icon {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem; margin-top: 2px;
+  }
+  .result-icon.correct { background: rgba(169, 205, 160, 0.45); color: var(--color-dark-green); }
+  .result-icon.wrong   { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+  .result-q { font-weight: 600; color: var(--color-dark-green); margin-bottom: 4px; line-height: 1.4; }
+  .result-ans { font-size: 0.88rem; color: rgba(38, 51, 45, 0.7); }
+  .result-correct { font-size: 0.88rem; color: #059669; margin-top: 2px; }
+
+  .state-box {
+    padding: 64px 24px; text-align: center;
+    color: rgba(38, 51, 45, 0.55); font-size: 0.95rem;
+  }
+  .state-box a { color: var(--color-dark-green); font-weight: 500; text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .test-shell { padding: 20px 16px 48px; }
+    .results-panel { padding: 24px 20px; }
+    .results-score { font-size: 3rem; }
+    .test-topbar { padding: 10px 14px; }
+    .test-timer { font-size: 0.95rem; padding: 5px 10px; min-width: 72px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="test-topbar">
+  <div class="test-topbar-inner">
+    <div>
+      <div class="test-topbar-meta" id="topbarMeta">Test in progress</div>
+      <div class="test-topbar-title" id="topbarTitle">Loading…</div>
+    </div>
+    <div class="test-topbar-right">
+      <div class="test-timer" id="timerDisplay">—</div>
+    </div>
+  </div>
+</div>
+
+<main id="mainContainer">
+  <div class="test-shell">
+    <div class="state-box">Loading test…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const attemptId = new URLSearchParams(location.search).get('attempt');
+
+let currentUser = null;
+let currentProfile = null;
+let attempt = null;
+let test = null;
+let questions = [];
+
+let testInProgress = false;
+let isSubmitting = false;
+let tabSwitchCount = 0;
+let timerInterval = null;
+let timeLeft = 0;
+
+let historyTrapInstalled = false;
+let antiCheatInstalled = false;
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+(async () => {
+  const auth = await requireAuth();
+  if (!auth) return;
+  currentUser = auth.session.user;
+  currentProfile = auth.profile;
+
+  if (!attemptId) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="test-shell"><div class="state-box">No test specified. <a href="daily-lessons.html">Go back →</a></div></div>';
+    return;
+  }
+
+  const { data: att, error } = await db
+    .from('test_attempts').select('*').eq('id', attemptId).single();
+
+  if (error || !att) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="test-shell"><div class="state-box">Test attempt not found. <a href="daily-lessons.html">Go back →</a></div></div>';
+    return;
+  }
+  attempt = att;
+  tabSwitchCount = attempt.tab_switches || 0;
+
+  const { data: t } = await db.from('tests').select('*').eq('id', attempt.test_id).single();
+  if (!t) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="test-shell"><div class="state-box">Test configuration missing. <a href="daily-lessons.html">Go back →</a></div></div>';
+    return;
+  }
+  test = t;
+
+  const { data: lesson } = await db.from('lessons').select('id, title').eq('id', test.lesson_id).single();
+
+  // Load questions in the order saved on the attempt
+  await loadQuestions();
+
+  document.getElementById('topbarTitle').textContent = test.title;
+
+  if (attempt.submitted_at) {
+    showResults();
+    return;
+  }
+
+  // Not yet submitted — begin test
+  beginTest(lesson);
+})();
+
+async function loadQuestions() {
+  let order = attempt.question_order;
+  const { data: all } = await db.from('questions').select('*').eq('test_id', attempt.test_id);
+
+  if (!all || !all.length) { questions = []; return; }
+
+  if (!order || !order.length) {
+    // Legacy attempt — build and save order
+    const shuffled = shuffle(all);
+    order = shuffled.map(q => q.id);
+    await db.from('test_attempts').update({ question_order: order }).eq('id', attempt.id);
+    questions = shuffled;
+    return;
+  }
+
+  const map = new Map(all.map(q => [q.id, q]));
+  questions = order.map(id => map.get(id)).filter(Boolean);
+  // Append any questions not in the order (rare — added after start)
+  for (const q of all) if (!questions.find(c => c.id === q.id)) questions.push(q);
+}
+
+/* ============================================================
+   BEGIN TEST — render + install anti-cheat
+   ============================================================ */
+function beginTest(lesson) {
+  if (!questions.length) {
+    document.getElementById('mainContainer').innerHTML =
+      '<div class="test-shell"><div class="state-box">This test has no questions. <a href="lesson.html?id=' +
+      (lesson?.id || '') + '">Go back →</a></div></div>';
+    return;
+  }
+
+  renderTest();
+
+  // Compute time remaining from started_at
+  if (test.time_limit_minutes) {
+    const startedAt = new Date(attempt.started_at).getTime();
+    const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
+    const totalSec = test.time_limit_minutes * 60;
+    const remaining = totalSec - elapsedSec;
+
+    if (remaining <= 0) {
+      // Time already expired while away — auto submit
+      toast('Your time has already expired. Submitting now.', 'error');
+      submitTest({ force: true, reason: 'timeout' });
+      return;
+    }
+    timeLeft = remaining;
+    updateTimerDisplay();
+    startTimer();
+  } else {
+    document.getElementById('timerDisplay').textContent = 'No limit';
+    document.getElementById('timerDisplay').style.fontSize = '0.85rem';
+  }
+
+  testInProgress = true;
+  installAntiCheat();
+  installHistoryTrap();
+  document.getElementById('topbarMeta').textContent = 'Test in progress';
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el || !test.time_limit_minutes) return;
+  el.textContent = formatTime(Math.max(0, timeLeft));
+  el.classList.toggle('warning', timeLeft <= 60 && timeLeft > 30);
+  el.classList.toggle('danger', timeLeft <= 30);
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      toast('Time is up — submitting your test', 'error');
+      submitTest({ force: true, reason: 'timeout' });
+    }
+  }, 1000);
+}
+
+/* ============================================================
+   RENDER TEST
+   ============================================================ */
+function renderTest() {
+  const questionsHtml = questions.map((q, i) => renderQuestion(q, i)).join('');
+
+  document.getElementById('mainContainer').innerHTML = `
+    <div class="test-shell">
+      <div class="test-intro-warning">
+        <strong>⚠️ Important:</strong> Switching tabs will submit your test immediately.
+        Only one attempt is allowed. Complete all questions before submitting.
+      </div>
+      <form id="testForm" autocomplete="off">
+        ${questionsHtml}
+        <div class="test-actions">
+          <button type="submit" class="btn btn-primary" id="submitTestBtn">Submit Test</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.getElementById('testForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await submitTest({ force: false, reason: 'manual' });
+  });
+
+  document.querySelectorAll('.mcq-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const group = opt.closest('.mcq-options');
+      group.querySelectorAll('.mcq-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      const radio = opt.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    });
+  });
+}
+
+function renderQuestion(q, index) {
+  if (q.type === 'mcq' || q.type === 'truefalse') {
+    const options = q.type === 'truefalse' ? ['True', 'False'] : (Array.isArray(q.options) ? q.options : []);
+    return `
+      <div class="question-block">
+        <div class="question-num">Question ${index + 1} of ${questions.length}</div>
+        <div class="question-text">${escapeHtml(q.question_text)}</div>
+        <div class="mcq-options">
+          ${options.map((opt, i) => `
+            <label class="mcq-option">
+              <input type="radio" name="q_${q.id}" value="${i}" required />
+              <span>${escapeHtml(opt)}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  return `
+    <div class="question-block">
+      <div class="question-num">Question ${index + 1} of ${questions.length}</div>
+      <div class="question-text">${escapeHtml(q.question_text)}</div>
+      <input type="text" class="short-input" name="q_${q.id}"
+             placeholder="Type your answer…" autocomplete="off" required />
+    </div>
+  `;
+}
+
+/* ============================================================
+   ANTI-CHEAT — first tab switch = instant submit
+   ============================================================ */
+function installAntiCheat() {
+  if (antiCheatInstalled) return;
+  antiCheatInstalled = true;
+
+  const blockContext = e => e.preventDefault();
+  const blockCopy = e => e.preventDefault();
+
+  document.addEventListener('contextmenu', blockContext);
+  document.addEventListener('copy', blockCopy);
+  document.addEventListener('cut', blockCopy);
+  document.addEventListener('paste', blockCopy);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  antiCheatCleanup = () => {
+    document.removeEventListener('contextmenu', blockContext);
+    document.removeEventListener('copy', blockCopy);
+    document.removeEventListener('cut', blockCopy);
+    document.removeEventListener('paste', blockCopy);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    antiCheatInstalled = false;
+  };
+}
+let antiCheatCleanup = null;
+
+function handleVisibilityChange() {
+  if (!testInProgress || isSubmitting) return;
+  if (document.hidden) {
+    // FIRST tab switch → immediate submit
+    tabSwitchCount++;
+    toast('Tab switch detected — submitting test', 'error');
+    submitTest({ force: true, reason: 'tab_switch' });
+  }
+}
+
+function handleBeforeUnload(e) {
+  if (!testInProgress || isSubmitting) return;
+  e.preventDefault();
+  e.returnValue = '';
+  return '';
+}
+
+/* ============================================================
+   HISTORY TRAP — cannot go back until submitted
+   ============================================================ */
+function installHistoryTrap() {
+  if (historyTrapInstalled) return;
+  historyTrapInstalled = true;
+  history.pushState({ trap: true }, '', location.href);
+  window.addEventListener('popstate', handlePopState);
+}
+
+function handlePopState() {
+  if (testInProgress && !isSubmitting) {
+    // Re-push to keep them trapped
+    history.pushState({ trap: true }, '', location.href);
+    toast('Complete and submit the test first', 'error');
+  }
+}
+
+function removeHistoryTrap() {
+  if (!historyTrapInstalled) return;
+  historyTrapInstalled = false;
+  window.removeEventListener('popstate', handlePopState);
+}
+
+/* ============================================================
+   SUBMIT
+   ============================================================ */
+async function submitTest({ force = false, reason = 'manual' } = {}) {
+  if (isSubmitting) return;
+  if (!attempt || attempt.submitted_at) return;
+
+  if (!force) {
+    const ok = confirm('Submit your test? You cannot retake it.');
+    if (!ok) return;
+  }
+
+  isSubmitting = true;
+  testInProgress = false;
+
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+  // Try to grab answers from the form (may be null if auto-submitted before render)
+  const form = document.getElementById('testForm');
+  const answers = {};
+  let score = 0;
+  let totalPossible = 0;
+
+  questions.forEach(q => {
+    const points = q.points || 1;
+    totalPossible += points;
+
+    if (q.type === 'mcq' || q.type === 'truefalse') {
+      const selected = form ? form.querySelector(`input[name="q_${q.id}"]:checked`) : null;
+      const idx = selected ? parseInt(selected.value, 10) : null;
+      answers[q.id] = idx;
+      if (idx !== null && String(idx) === String(q.correct_answer)) score += points;
+    } else {
+      const input = form ? form.querySelector(`input[name="q_${q.id}"]`) : null;
+      const val = (input?.value || '').trim();
+      answers[q.id] = val;
+      if (val.toLowerCase() === String(q.correct_answer).trim().toLowerCase()) score += points;
+    }
+  });
+
+  const cheatingDetected = tabSwitchCount > 0;
+
+  const { data, error } = await db.from('test_attempts').update({
+    submitted_at: new Date().toISOString(),
+    score,
+    total_possible: totalPossible,
+    answers,
+    tab_switches: tabSwitchCount,
+    cheating_detected: cheatingDetected
+  }).eq('id', attempt.id).select().single();
+
+  if (error) {
+    isSubmitting = false;
+    toast('Failed to submit: ' + error.message, 'error');
+    // Give them another chance
+    testInProgress = true;
+    return;
+  }
+
+  attempt = data;
+
+  // Cleanup
+  if (antiCheatCleanup) antiCheatCleanup();
+  removeHistoryTrap();
+
+  // Show results
+  document.getElementById('topbarMeta').textContent = 'Test complete';
+  document.getElementById('timerDisplay').textContent = '✓';
+  document.getElementById('timerDisplay').classList.remove('warning', 'danger');
+  showResults();
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function showResults() {
+  const pct = attempt.total_possible > 0
+    ? Math.round((attempt.score / attempt.total_possible) * 100) : 0;
+
+  const showCorrect = test.show_correct_answers !== false;
+  const passing = test.passing_score;
+  const passed = passing != null ? pct >= passing : null;
+
+  const passBadge = passed === true
+    ? '<div class="pass-badge pass">✓ Passed</div>'
+    : passed === false
+      ? '<div class="pass-badge fail">✕ Below passing mark</div>'
+      : '';
+
+  const cheatingNote = attempt.cheating_detected || attempt.tab_switches > 0
+    ? `<div style="margin-top:16px;padding:10px 14px;background:rgba(239,68,68,0.1);border-radius:6px;font-size:0.85rem;color:#b91c1c;">
+         ⚠️ This test was auto-submitted due to a tab switch during the test.
+       </div>`
+    : '';
+
+  const items = questions.map((q, i) => {
+    const studentAns = attempt.answers?.[q.id];
+    let isCorrect = false;
+    let displayAnswer = '(no answer)';
+    let correctDisplay = '';
+
+    if (q.type === 'mcq' || q.type === 'truefalse') {
+      const opts = q.type === 'truefalse' ? ['True', 'False'] : (q.options || []);
+      if (studentAns !== null && studentAns !== undefined) {
+        displayAnswer = opts[studentAns] ?? '(no answer)';
+        isCorrect = String(studentAns) === String(q.correct_answer);
+      }
+      correctDisplay = opts[parseInt(q.correct_answer, 10)] ?? '';
+    } else {
+      displayAnswer = studentAns || '(no answer)';
+      isCorrect = String(studentAns || '').trim().toLowerCase() ===
+                  String(q.correct_answer).trim().toLowerCase();
+      correctDisplay = q.correct_answer;
+    }
+
+    return `
+      <div class="result-item">
+        <div class="result-icon ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓' : '✕'}</div>
+        <div style="flex:1;">
+          <div class="result-q">${i + 1}. ${escapeHtml(q.question_text)}</div>
+          <div class="result-ans">Your answer: ${escapeHtml(String(displayAnswer))}</div>
+          ${!isCorrect && showCorrect ? `<div class="result-correct">Correct: ${escapeHtml(String(correctDisplay))}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('mainContainer').innerHTML = `
+    <div class="results-panel">
+      <div class="results-header">
+        <div class="results-label">Your Score</div>
+        <div class="results-score">${attempt.score}/${attempt.total_possible}</div>
+        <div class="results-pct">${pct}%</div>
+        ${passBadge}
+        ${cheatingNote}
+      </div>
+      <div style="margin-top:32px;">${items}</div>
+      <div style="margin-top:36px;text-align:center;">
+        <a href="daily-lessons.html" class="btn btn-primary">← Back to Lessons</a>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+</script>
+</body>
+</html>

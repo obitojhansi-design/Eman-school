@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign In · Eman Educational Complex</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="lessons.css" />
+<style>
+  .login-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 32px 16px; background: var(--color-ivory);
+    background-image: radial-gradient(ellipse at top left, rgba(169, 205, 160, 0.15) 0%, transparent 60%);
+  }
+  .login-card {
+    width: 100%; max-width: 420px; background: var(--color-white);
+    padding: 40px 32px; border-radius: 8px;
+    box-shadow: 0 20px 60px -20px rgba(23, 75, 58, 0.2);
+    border: 1px solid rgba(23, 75, 58, 0.08);
+  }
+  .login-brand { text-align: center; margin-bottom: 28px; }
+  .login-brand img { height: 56px; margin: 0 auto 12px; }
+  .login-brand h1 { font-size: 1.5rem; color: var(--color-dark-green); margin-bottom: 4px; }
+  .login-brand p { font-size: 0.85rem; color: rgba(38, 51, 45, 0.6); }
+  .login-error {
+    background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+    padding: 10px 14px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 16px;
+    display: none;
+  }
+  .login-error.show { display: block; }
+  .login-btn { width: 100%; justify-content: center; margin-top: 8px; }
+  .login-footer { text-align: center; margin-top: 24px; font-size: 0.78rem; color: rgba(38, 51, 45, 0.5); }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="logo.png" alt="Eman Educational Complex" onerror="this.style.display='none';" />
+      <h1>Eman Educational Complex</h1>
+      <p>Sign in to continue</p>
+    </div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn btn-primary login-btn" id="submitBtn">
+        <span id="submitText">Sign In</span>
+      </button>
+    </form>
+
+    <p class="login-footer">Accounts are created by school administration.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(async () => {
+  // If already logged in, redirect by role
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+    if (profile) {
+      window.location.href = profile.role === 'student' ? 'daily-lessons.html' : 'admin.html';
+      return;
+    }
+  }
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitText = document.getElementById('submitText');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove('show');
+    submitBtn.disabled = true;
+    submitText.textContent = 'Signing in…';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      errorBox.textContent = error.message;
+      errorBox.classList.add('show');
+      submitBtn.disabled = false;
+      submitText.textContent = 'Sign In';
+      return;
+    }
+
+    const { data: profile } = await db.from('profiles').select('role').eq('id', data.user.id).single();
+    window.location.href = profile?.role === 'student' ? 'daily-lessons.html' : 'admin.html';
+  });
+})();
+</script>
+</body>
+</html>

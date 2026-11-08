@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Lessons · Eman Educational Complex</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="lessons.css" />
+<style>
+  .filter-bar {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px;
+    padding: 16px; background: var(--color-white); border-radius: 8px;
+    border: 1px solid rgba(23, 75, 58, 0.1);
+  }
+  .filter-chip {
+    padding: 8px 16px; font-size: 0.85rem; font-weight: 500;
+    border-radius: 999px; cursor: pointer;
+    background: transparent; color: var(--color-dark-green);
+    border: 1px solid rgba(23, 75, 58, 0.2);
+    transition: all var(--transition);
+  }
+  .filter-chip:hover { border-color: var(--color-dark-green); }
+  .filter-chip.active { background: var(--color-dark-green); color: var(--color-ivory); border-color: var(--color-dark-green); }
+  .loading { text-align: center; padding: 64px; color: rgba(38, 51, 45, 0.5); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="index.html" class="header-brand">
+        <img src="logo.png" alt="Eman Educational Complex" onerror="this.style.display='none';" />
+        <span class="brand-name">Eman Educational Complex<small>Daily Lessons</small></span>
+      </a>
+      <nav class="header-nav">
+        <span id="studentName" style="font-size:0.85rem; color:var(--color-dark-text);"></span>
+        <button class="btn-signout" onclick="signOut()">Sign Out</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="hero-eyebrow">Daily Lessons</span>
+      <h1>Your <em>lessons</em>.</h1>
+      <p class="page-hero-lead">Watch the lesson, review the notes, then take the short test to complete the day.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="filter-bar" id="filterBar"></div>
+    <div id="lessonsContainer"><div class="loading">Loading lessons…</div></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <span>&copy; 2026 Eman Educational Complex</span>
+      <span>Made by <a href="https://pixlnex.vercel.app" target="_blank">Pixlnex</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+let allLessons = [];
+let currentFilter = 'all';
+
+(async () => {
+  const auth = await requireAuth();
+  if (!auth) return;
+  const { profile } = auth;
+
+  document.getElementById('studentName').textContent = profile.full_name;
+
+  // Load lessons for the student's class
+  const { data: lessons, error } = await db
+    .from('lessons')
+    .select('*')
+    .eq('class_name', profile.class_name || '10th')
+    .eq('published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('lessonsContainer').innerHTML =
+      `<div class="empty-state">Error loading lessons: ${error.message}</div>`;
+    return;
+  }
+  allLessons = lessons || [];
+
+  // Get tests to know which lessons have a test
+  const { data: tests } = await db
+    .from('tests')
+    .select('id, lesson_id, title')
+    .in('lesson_id', allLessons.map(l => l.id).concat(['00000000-0000-0000-0000-000000000000']));
+  const testsByLesson = {};
+  (tests || []).forEach(t => { testsByLesson[t.lesson_id] = t; });
+
+  // Load submitted attempts for this student
+  const { data: attempts } = await db
+    .from('test_attempts')
+    .select('test_id, submitted_at, score, total_possible')
+    .eq('student_id', profile.id)
+    .not('submitted_at', 'is', null);
+  const attemptsByTest = {};
+  (attempts || []).forEach(a => { attemptsByTest[a.test_id] = a; });
+
+  renderFilters();
+  renderLessons(profile, testsByLesson, attemptsByTest);
+})();
+
+function renderFilters() {
+  const subjects = ['all', ...new Set(allLessons.map(l => l.subject))];
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = subjects.map(s =>
+    `<button class="filter-chip ${currentFilter === s ? 'active' : ''}" data-filter="${s}">${s === 'all' ? 'All Lessons' : s}</button>`
+  ).join('');
+  bar.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.dataset.filter;
+      renderFilters();
+      renderLessons(window.__profile, window.__testsByLesson, window.__attemptsByTest);
+    });
+  });
+}
+
+function renderLessons(profile, testsByLesson, attemptsByTest) {
+  window.__profile = profile;
+  window.__testsByLesson = testsByLesson;
+  window.__attemptsByTest = attemptsByTest;
+
+  const filtered = currentFilter === 'all'
+    ? allLessons
+    : allLessons.filter(l => l.subject === currentFilter);
+
+  const container = document.getElementById('lessonsContainer');
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-state">No lessons available yet. Check back soon.</div>';
+    return;
+  }
+
+  container.innerHTML = `<div class="card-grid">${filtered.map(lesson => {
+    const test = testsByLesson[lesson.id];
+    const attempt = test ? attemptsByTest[test.id] : null;
+    const date = new Date(lesson.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    let testBadge = '';
+    if (test) {
+      if (attempt) {
+        testBadge = `<div style="margin-top:8px;padding:8px 12px;background:rgba(169,205,160,0.2);border-radius:4px;font-size:0.82rem;color:var(--color-dark-green);">
+          ✓ Test completed — ${attempt.score}/${attempt.total_possible}
+        </div>`;
+      } else {
+        testBadge = `<div style="margin-top:8px;padding:8px 12px;background:rgba(198,164,92,0.15);border-radius:4px;font-size:0.82rem;color:#8a6d2b;font-weight:500;">
+          Test available
+        </div>`;
+      }
+    }
+    return `
+      <a href="lesson.html?id=${lesson.id}" class="card">
+        <span class="card-badge">${lesson.class_name} · ${lesson.subject}</span>
+        <h3 class="card-title">${escapeHtml(lesson.title)}</h3>
+        <p class="card-desc">${escapeHtml(lesson.description || 'No description')}</p>
+        <div class="card-meta">${date}</div>
+        ${testBadge}
+      </a>
+    `;
+  }).join('')}</div>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+</script>
+</body>
+</html>
